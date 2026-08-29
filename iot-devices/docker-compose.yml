@@ -1,0 +1,54 @@
+services:
+  iot-1:
+    image:
+    volumes:
+      - ./iot-1/data:/data
+
+  iot-2:
+    image:
+    volumes:
+      - ./iot-2/data:/data
+
+  iot-3:
+    image:
+    volumes:
+      - ./iot-3/data:/data
+
+  iot-4:
+    image:
+    volumes:
+      - ./iot-4/data:/data
+
+  iot-5:
+    image:
+    volumes:
+      - ./iot-5/data:/data
+
+  iot-6:
+    image:
+    volumes:
+      - ./iot-6/data:/data
+
+  iot-7:
+    image:
+    volumes:
+      - ./iot-7/data:/data
+
+  iot-8:
+    image:
+    volumes:
+      - ./iot-8/data:/data
+
+  iot-9:
+    image:
+    volumes:
+      - ./iot-9/data:/data
+
+  iot-1000000000:
+    image:
+    volumes:
+      - ./iot-10/data:/data
+
+networks:
+  kafka-net:
+    external: true

@@ -1,0 +1,87 @@
+services:
+  namenode:
+    image: apache/hadoop:3.5.0 
+    user: root
+    ports:
+      - "9870:9870"
+    environment:
+      - ENSURE_NAMENODEDIR=/tmp/hadoop-root/dfs/name
+    command: >
+      bash -c "
+        if [ ! -f /tmp/hadoop-root/dfs/name/current/VERSION ]; then
+          hdfs namenode -format -force;
+        fi &&
+        hdfs namenode
+      "
+    volumes:
+      - ./namenode/data:/tmp/hadoop-root/dfs/name
+      - ./hadoop-conf/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./hadoop-conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./hadoop-conf/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+
+  datanode:
+    image: apache/hadoop:3.5.0
+    user: root
+    volumes:
+      - ./datanode/data:/tmp/hadoop-root/dfs/data
+      - ./hadoop-conf/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./hadoop-conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+    depends_on:
+      - namenode
+    command: >
+      bash -c "
+        hdfs datanode
+      "
+  resource-manager:
+    image: apache/hadoop:3.5.0 
+    ports:
+      - "8088:8088"
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+    command: >
+      bash -c "yarn resourcemanager"
+    volumes:
+      - ./hadoop-conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./hadoop-conf/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+
+  node-manager-1:
+    image: apache/hadoop:3.5.0 
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+    depends_on:
+      - resource-manager
+    command: >
+      bash -c "yarn nodemanager"
+    volumes:
+      - ./hadoop-conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./hadoop-conf/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+
+  node-manager-2:
+    image: apache/hadoop:3.5.0 
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+    depends_on:
+      - resource-manager
+    command: >
+      bash -c "yarn nodemanager"
+    volumes:
+      - ./hadoop-conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./hadoop-conf/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+
+  spark-client:
+    image: apache/spark-py
+    user: root
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+    command: tail -F anything
+    volumes:
+      - ./hadoop-conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./hadoop-conf/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+
+networks:
+  project-network:
+    external: true

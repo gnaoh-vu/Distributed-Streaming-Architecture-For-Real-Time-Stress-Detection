@@ -1,0 +1,23 @@
+services:
+  emqx-core-1:
+    image: emqx/emqx
+    ports:
+      - 18083:18083
+      - 1883:1883
+      - 8883:8883
+    environment:
+    - EMQX_NODE__NAME=emqx@core1.emqx.io
+    - EMQX_CLUSTER__DISCOVERY_STRATEGY=static
+    - EMQX_CLUSTER__STATIC__SEEDS=[emqx@core1.emqx.io]
+    - EMQX_DASHBOARD__DEFAULT_PASSWORD=default
+    volumes:
+    - ./emqx-core-1/data:/opt/emqx/data
+    - ./emqx-core-1/log:/opt/emqx/log
+    networks:
+      project-network:
+        aliases:
+        - core1.emqx.io
+
+networks:
+  project-network:
+    external: true
