@@ -6,5 +6,7 @@ kafka-tutorial/
 kafka-cluster/*/data/*
 spark-cluster/datanode/data/*
 spark-cluster/namenode/data/*
+models/adarp/ADARP
+models/adarp/origin
 refs/*
 
