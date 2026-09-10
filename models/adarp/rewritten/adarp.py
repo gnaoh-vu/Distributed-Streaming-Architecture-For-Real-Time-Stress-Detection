@@ -1,6 +1,9 @@
 import os
 import csv
+
+import numpy as np
 from enum import StrEnum
+from scipy.signal import butter, filtfilt, lfilter
 
 class SignalType(StrEnum):
     TEMP = 'TEMP'
@@ -11,19 +14,14 @@ class SignalType(StrEnum):
 
 class Signal():
     def __init__(self, start_time, freq, data: list, s_type: SignalType):
+        self.data = np.asarray(data, dtype=np.float32)
         self.start_time = start_time
-        self.freq = freq
-        self.data = data
         self.s_type = s_type
+        self.freq = freq
 
     @property
     def end_time(self):
         return self.start_time + (len(self.data) / self.freq)  
-
-class Segment():
-    def __init__(self, data: list, s_type: SignalType):
-        self.data = data
-        self.s_type = s_type
 
 SENSOR_DATA_PATH = '../ADARP/Sensor Data'
 PARTICIPANTS = [
@@ -67,28 +65,11 @@ def read_tag_timestamps(path: str):
 
     with open(os.path.join(path, 'tags.csv')) as tags_file:
         reader = csv.reader(tags_file)
-        # valid = next(reader, None)
-
-        # if not valid: return []
         for row in reader: timestamps.extend([float(e) for e in row])
 
     return timestamps
 
-def read_all_tag_timestamps(path: str) -> list:
-    timestamps = []
-
-    for subfolder in os.listdir(path):
-        tags_path = os.path.join(path, subfolder, 'tags.csv')
-        with open(tags_path, newline='') as tags_file:
-            reader = csv.reader(tags_file)
-            valid = next(reader, None)
-
-            if not valid: continue
-            for row in reader: timestamps.extend([float(e) for e in row])
-
-    return timestamps
-
-def get_segments_around_tags(signal: Signal, timestamps: list) -> list[Segment]:
+def get_segments_around_tags(signal: Signal, timestamps: list) -> list[Signal]:
     n_obs = int(STRESSED_BUFFER * signal.freq)
     segments = []
 
@@ -100,14 +81,16 @@ def get_segments_around_tags(signal: Signal, timestamps: list) -> list[Segment]:
             if (index - n_obs < 0 or index + n_obs > len(signal.data)): 
                 continue
 
-            segments.append(Segment(
+            segments.append(Signal(
+                signal.start_time,
+                signal.freq,
                 signal.data[index - n_obs : index + n_obs],
                 signal.s_type,
             ))
 
     return segments
 
-def get_segments_outside_tags(signal: Signal, timestamps: list) -> list[Segment]:
+def get_segments_outside_tags(signal: Signal, timestamps: list) -> list[Signal]:
     n_obs = int(STRESSED_BUFFER * signal.freq)
     indices = [0, len(signal.data) - 1]
     segments = []
@@ -122,19 +105,23 @@ def get_segments_outside_tags(signal: Signal, timestamps: list) -> list[Segment]
 
     for i in range(0, len(indices), 2):
         if (indices[i] < indices[i + 1]):
-            segments.append(Segment(
+            segments.append(Signal(
+                signal.start_time,
+                signal.freq,
                 signal.data[indices[i] : indices[i + 1]],
                 signal.s_type
             ))
 
     return segments
 
-def get_stressed_segments(include_signal_types: list[SignalType])-> dict[str, dict[str, list[Segment]]]:
+def get_segments(include_signal_types: list[SignalType], is_stress=True) -> dict[str, dict[str, list[Signal]]]:
     if len(include_signal_types) == 0:
         print('No signals were included')
         return
 
     participants_signals = {p: {} for p in PARTICIPANTS}
+    f = get_segments_around_tags if is_stress else get_segments_outside_tags
+
     for p in PARTICIPANTS:
         p_invalid = 0
         p_folder = os.path.join(SENSOR_DATA_PATH, p)
@@ -146,77 +133,52 @@ def get_stressed_segments(include_signal_types: list[SignalType])-> dict[str, di
 
             for s_type in include_signal_types:
                 signal = read_signal_data(s_type, data_folder)
-                segments = get_segments_around_tags(signal, timestamps)
-                if len(segments): p_segments[str(s_type)].extend(segments)
+                segments = f(signal, timestamps)
+
+                if len(segments): 
+                    p_segments[str(s_type)].extend(segments)
 
         participants_signals[p] = p_segments
+
     return participants_signals
 
-def get_non_stressed_segments(include_signal_types: list[SignalType]) -> dict[str, dict[str, list[Segment]]]:
-    if len(include_signal_types) == 0:
-        print('No signals were included')
-        return
-
-    participants_signals = {p: {} for p in PARTICIPANTS}
-    for p in PARTICIPANTS:
-        p_folder = os.path.join(SENSOR_DATA_PATH, p)
-        p_segments = { 'HR': [], 'EDA': [], 'BVP': [], 'ACC': [], 'TEMP': [] }
-
-        for folder in os.listdir(p_folder):
-            data_folder = os.path.join(p_folder, folder)
-            timestamps = read_tag_timestamps(data_folder)
-
-            for s_type in include_signal_types:
-                signal = read_signal_data(s_type, data_folder)
-                segments = get_segments_outside_tags(signal, timestamps)
-                if len(segments): p_segments[str(s_type)].extend(segments)
-
-        participants_signals[p] = p_segments
-    return participants_signals
-
-def extract_windows_from_segment(segment: Segment) -> list[Segment]:
+def extract_windows_from_segment(segment: Signal) -> list[Signal]:
     window_size = FREQ[str(segment.s_type)] * WINDOW_LENGTH
-    offset = int(window_size * OVERLAP_RATIO)
-    segments = []
+    offset = int(window_size * (1 - OVERLAP_RATIO))
+    windows = []
 
     for i in range(0, len(segment.data), offset):
         data = segment.data[i : i + window_size]
         if (len(data) == window_size): 
-            segments.append(Segment(data, segment.s_type))
+            windows.append(Signal(
+                segment.start_time,
+                segment.freq,
+                data, 
+                segment.s_type
+            ))
 
-    return segments
+    return windows
 
-def extract_windows_from_signal(segments: list[Segment]):
-    segments = []
+def extract_windows_from_signal(segments: list[Signal]):
+    all_windows = []
 
     for segment in segments:
         windows = extract_windows_from_segment(segment)
-        segments.extend(windows)
+        all_windows.extend(windows)
 
-    return segments
+    return all_windows
 
-# normalize
-# nosie filter
+def min_max_scaler(segment: Signal):
+  segment.data = segment.data - (np.min(segment.data))
+  segment.data /= (np.max(segment.data) - np.min(segment.data))
 
-participants_signals = get_stressed_segments([SignalType.EDA])
-segment = participants_signals[PARTICIPANTS[0]]['EDA'][0]
-windows = extract_windows_from_segment(segment)
-print(len(windows))
+def butter_lpf(segment: Signal, order, fs, cutoff):
+    b, a = butter(order, cutoff, btype='lowpass', fs=fs)
+    filtered = lfilter(b, a, segment.data)
+    segment.data = filtered
 
+participants_signals = get_segments([SignalType.EDA], is_stress=False)
+signal = participants_signals[PARTICIPANTS[0]]['EDA']
+print(len(signal))
 
 # get_non_stressed_segments([SignalType.EDA])
-
-# p_path = os.path.join(SENSOR_DATA_PATH, PARTICIPANTS[0])
-# p_day_path = os.path.join(p_path, 'A01f4c_190430-161241')
-
-# timestamps = read_all_tag_timestamps(p_path)
-# eda_data = read_signal_data(SignalType.EDA, p_day_path)
-# segments = get_segments_around_tags(eda_data, timestamps)
-
-# count = 0
-# for segment in segments:
-    # count +=1
-    # print(len(segment.data))
-
-# print(count)
-
