@@ -114,15 +114,22 @@ def get_segments_outside_tags(signal: Signal, timestamps: list) -> list[Signal]:
 
     return segments
 
-def get_segments(include_signal_types: list[SignalType], is_stress=True) -> dict[str, dict[str, list[Signal]]]:
+def get_segments(
+        include_signal_types: list[SignalType], is_stress=True, 
+        from_patient=0, to_patient=len(PARTICIPANTS)
+) -> tuple[
+        dict[str, dict[str, list[Signal]]], 
+        dict[str, list[Signal]]
+]:
     if len(include_signal_types) == 0:
         print('No signals were included')
         return
 
     participants_signals = {p: {} for p in PARTICIPANTS}
+    all_signals = { 'HR': [], 'EDA': [], 'BVP': [], 'ACC': [], 'TEMP': [] }
     f = get_segments_around_tags if is_stress else get_segments_outside_tags
 
-    for p in PARTICIPANTS:
+    for p in PARTICIPANTS[from_patient:to_patient]:
         p_invalid = 0
         p_folder = os.path.join(SENSOR_DATA_PATH, p)
         p_segments = { 'HR': [], 'EDA': [], 'BVP': [], 'ACC': [], 'TEMP': [] }
@@ -138,9 +145,20 @@ def get_segments(include_signal_types: list[SignalType], is_stress=True) -> dict
                 if len(segments): 
                     p_segments[str(s_type)].extend(segments)
 
-        participants_signals[p] = p_segments
+        if (SignalType.EDA in include_signal_types):
+            for s in p_segments['EDA']:
+                min_max_scaler(s)
+                butter_lpf(
+                    s, 
+                    order=4, 
+                    fs=FREQ[str(SignalType.EDA)], 
+                    cutoff=5/FREQ[str(SignalType.EDA)]
+                )
 
-    return participants_signals
+        participants_signals[p] = p_segments
+        for k, v in p_segments.items(): all_signals[k].extend(v)
+
+    return participants_signals, all_signals
 
 def extract_windows_from_segment(segment: Signal) -> list[Signal]:
     window_size = FREQ[str(segment.s_type)] * WINDOW_LENGTH
@@ -170,15 +188,13 @@ def extract_windows_from_signal(segments: list[Signal]):
 
 def min_max_scaler(segment: Signal):
   segment.data = segment.data - (np.min(segment.data))
-  segment.data /= (np.max(segment.data) - np.min(segment.data))
+  segment.data /= np.max(segment.data)
 
 def butter_lpf(segment: Signal, order, fs, cutoff):
     b, a = butter(order, cutoff, btype='lowpass', fs=fs)
     filtered = lfilter(b, a, segment.data)
     segment.data = filtered
 
-participants_signals = get_segments([SignalType.EDA], is_stress=False)
-signal = participants_signals[PARTICIPANTS[0]]['EDA']
-print(len(signal))
-
-# get_non_stressed_segments([SignalType.EDA])
+# participants_signals = get_segments([SignalType.EDA], is_stress=False)
+# signal = participants_signals[PARTICIPANTS[0]]['EDA']
+# print(signal[0].data)
