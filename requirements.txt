@@ -10,3 +10,6 @@ setuptools==78.1.0
 sympy==1.14.0
 torch==2.14.0+cpu
 typing_extensions==4.16.0
+fastapi==0.116.2
+pydantic==2.12.5
+uvicorn[standard]==0.35.0

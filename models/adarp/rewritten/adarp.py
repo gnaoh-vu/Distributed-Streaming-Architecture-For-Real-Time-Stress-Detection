@@ -118,7 +118,7 @@ def get_segments(
         include_signal_types: list[SignalType], is_stress=True, 
         from_patient=0, to_patient=len(PARTICIPANTS)
 ) -> tuple[
-        dict[str, dict[str, list[Signal]]], 
+        dict[str, dict[str, list[Signal]]],     
         dict[str, list[Signal]]
 ]:
     if len(include_signal_types) == 0:
