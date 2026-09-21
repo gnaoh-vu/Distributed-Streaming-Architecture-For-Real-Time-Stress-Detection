@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 class SensorSignal(BaseModel):
+    timestamp: float
     eda: float
     hr: int
     acc: float

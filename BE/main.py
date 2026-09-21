@@ -24,7 +24,7 @@ async def predict_endpoint(websocket: WebSocket, patient_id: str):
 
             res = RealtimePayload(
                 patient_id = patient_id,
-                timestamp = time.time(),
+                timestamp = sensor_data.timestamp,
                 metrics = sensor_data,
                 prediction = prediction
             )

@@ -5,148 +5,190 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IoT Stress Real-time Monitoring Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --accent-blue: #38bdf8;
-            --accent-green: #22c55e;
-            --accent-red: #ef4444;
-            --border-color: #334155;
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --panel-face: #fafafa;
+            --text-main: #16181c;
+            --text-sub: #8a8f98;
+            --border-color: #e3e5e8;
+
+            --accent-blue: #2b6f76;
+            --accent-green: #2f7d4f;
+            --accent-red: #c0392b;
+            --accent-amber: #a9720d;
+            --accent-violet: #6952b3;
+            --accent-orange: #b05a1f;
+            --accent-rose: #a3486b;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
+            font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            padding: 20px;
+            padding: 28px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 22px;
+            min-height: 100vh;
         }
 
         header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-end;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
+            padding-bottom: 16px;
+        }
+
+        header h2 {
+            font-weight: 600;
+            font-size: 1.2rem;
+            letter-spacing: 0.01em;
         }
 
         .status-badge {
-            background-color: rgba(34, 197, 94, 0.2);
-            color: var(--accent-green);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
+            font-family: "IBM Plex Mono", monospace;
+            color: var(--text-sub);
+            font-size: 0.78rem;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background-color: var(--accent-green);
             border-radius: 50%;
-            animation: pulse 1.5s infinite;
+            animation: pulse 1.8s infinite;
         }
 
         @keyframes pulse {
-            0% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.3;
-            }
-
-            100% {
-                opacity: 1;
-            }
+            0% { opacity: 1; }
+            50% { opacity: 0.2; }
+            100% { opacity: 1; }
         }
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 20px;
+            grid-template-columns: 260px 1fr;
+            gap: 22px;
+            flex: 1;
         }
 
         .patient-list {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
-            border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
+            align-self: start;
+        }
+
+        .patient-list h3 {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-sub);
+            padding-bottom: 10px;
+            margin-bottom: 4px;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: none;
         }
 
         .patient-card {
-            background: #0f172a;
-            padding: 12px;
-            border-radius: 8px;
+            background: var(--card-bg);
+            padding: 12px 14px;
             border: 1px solid var(--border-color);
+            border-left: 2px solid var(--border-color);
             cursor: pointer;
-            transition: all 0.2s ease;
+        }
+
+        .patient-card strong {
+            font-family: "IBM Plex Mono", monospace;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .patient-card p {
+            margin-top: 3px;
+            font-size: 0.78rem;
+            color: var(--text-sub);
         }
 
         .patient-card.active {
-            border-color: var(--accent-blue);
-            background: #1e293b;
+            border-left-color: var(--accent-blue);
         }
 
         .patient-card.stress {
-            border-color: var(--accent-red);
+            border-left-color: var(--accent-red);
+        }
+
+        .patient-card.stress p {
+            color: var(--accent-red);
         }
 
         .main-panel {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 22px;
         }
 
         .metric-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+            border-top: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
         }
 
         .metric-card {
             background: var(--card-bg);
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            padding: 14px 16px;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .metric-label {
             color: var(--text-sub);
-            font-size: 0.85rem;
+            font-size: 0.72rem;
+            line-height: 1.3;
+            display: block;
         }
 
         .metric-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-top: 5px;
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-top: 6px;
+            font-variant-numeric: tabular-nums;
         }
 
         .chart-card {
             background: var(--card-bg);
-            border-radius: 12px;
             padding: 20px;
             border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 14px;
+        }
+
+        .chart-card h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        #time-display {
+            font-family: "IBM Plex Mono", monospace;
+            color: var(--text-sub);
+            font-size: 0.78rem;
         }
 
         .chart-container {
@@ -158,33 +200,32 @@
         canvas {
             width: 100%;
             height: 100%;
-            background: #0f172a;
-            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #ffffff;
         }
 
         .controls {
             display: flex;
             align-items: center;
-            gap: 15px;
-            background: #0f172a;
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            gap: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
         }
 
         .btn {
-            background: var(--accent-blue);
-            color: #000;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: bold;
+            font-family: "IBM Plex Mono", monospace;
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 7px 14px;
+            font-weight: 500;
+            font-size: 0.78rem;
             cursor: pointer;
         }
 
         .btn-live {
-            background: var(--accent-green);
-            color: #fff;
+            color: var(--accent-green);
+            border-color: var(--accent-green);
         }
 
         .slider-container {
@@ -196,7 +237,18 @@
 
         input[type="range"] {
             width: 100%;
-            accent-color: var(--accent-blue);
+            accent-color: var(--text-main);
+        }
+
+        #slider-time-label {
+            font-family: "IBM Plex Mono", monospace;
+            color: var(--text-main);
+        }
+
+        @media (max-width: 720px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -207,7 +259,7 @@
         <h2>IoT Stress Real-time Monitoring</h2>
         <div class="status-badge">
             <div class="status-dot"></div>
-            <span>SIMULATOR LIVE CONNECTED</span>
+            <span>Simulator connected</span>
         </div>
     </header>
 
@@ -217,11 +269,11 @@
             <h3>Danh sách Bệnh nhân</h3>
             <div class="patient-card active" id="card-p1">
                 <strong>Part 101C</strong>
-                <p style="color: var(--text-sub); font-size: 0.85rem;">Status: Normal</p>
+                <p>Status: Normal</p>
             </div>
             <div class="patient-card stress" id="card-p2">
                 <strong>Part 102C</strong>
-                <p style="color: var(--accent-red); font-size: 0.85rem;">Status: STRESS DETECTED</p>
+                <p>Status: STRESS DETECTED</p>
             </div>
         </div>
 
@@ -238,19 +290,19 @@
                 </div>
                 <div class="metric-card">
                     <span class="metric-label">Blood Volume Pulse</span>
-                    <div class="metric-value" id="val-bvp" style="color: #f59e0b;">0.00</div>
+                    <div class="metric-value" id="val-bvp" style="color: var(--accent-amber);">0.00</div>
                 </div>
                 <div class="metric-card">
                     <span class="metric-label">Accelerometer</span>
-                    <div class="metric-value" id="val-accelerometer" style="color: #c084fc;">0.00 g</div>
+                    <div class="metric-value" id="val-accelerometer" style="color: var(--accent-violet);">0.00 g</div>
                 </div>
                 <div class="metric-card">
                     <span class="metric-label">Temperature</span>
-                    <div class="metric-value" id="val-temperature" style="color: #f97316;">0.0 °C</div>
+                    <div class="metric-value" id="val-temperature" style="color: var(--accent-orange);">0.0 °C</div>
                 </div>
                 <div class="metric-card">
                     <span class="metric-label">Inter-beat Interval</span>
-                    <div class="metric-value" id="val-ibi" style="color: #fb7185;">0 ms</div>
+                    <div class="metric-value" id="val-ibi" style="color: var(--accent-rose);">0 ms</div>
                 </div>
                 <div class="metric-card">
                     <span class="metric-label">AI Prediction (Current Window)</span>
@@ -261,7 +313,7 @@
             <div class="chart-card">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h3>Real-time Signal Track (EDA & Stress Window)</h3>
-                    <span id="time-display" style="color: var(--text-sub); font-size: 0.9rem;">Live: 0s</span>
+                    <span id="time-display">Live: 0s</span>
                 </div>
 
                 <div class="chart-container">
@@ -285,201 +337,8 @@
         </div>
     </div>
 
-    <script>
-        // --- DATA BUFFER & CONFIG ---
-        const MAX_BUFFER_SIZE = 300; // Lưu tối đa 300 giây dữ liệu
-        let dataBuffer = [];
-        let isLive = true;
-        let currentTimeStep = 0;
-
-        // --- CANVAS SETUP ---
-        const canvas = document.getElementById('signalChart');
-        const ctx = canvas.getContext('2d');
-
-        function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // --- BƯỚC 1: LẤY DỮ LIỆU TỪ UI ---
-        function getSensorDataFromUI() {
-            // 1. Tạo giả lập giá trị tự động biến đổi theo bước thời gian từ UI
-            const isStress = currentTimeStep >= 100 && currentTimeStep <= 160;
-            const baseEDA = isStress ? 8.0 : 2.0;
-            const noise = (Math.random() - 0.5) * 0.8;
-
-            // 2. Trả về đúng Schema SensorSignal mà FastAPI Backend yêu cầu
-            return {
-                eda: parseFloat(Math.max(0.1, baseEDA + noise + Math.sin(currentTimeStep * 0.1) * 1.2).toFixed(2)),
-                hr: Math.floor(isStress ? 110 + Math.random() * 10 : 70 + Math.random() * 5),
-                acc: parseFloat((1 + (Math.random() - 0.5) * (isStress ? 0.35 : 0.15)).toFixed(2)),
-                bvp: parseFloat(Math.max(0.1, (isStress ? 1.2 : 0.9) + (Math.random() - 0.5) * 0.25).toFixed(2)),
-                temp: parseFloat((36.5 + (isStress ? 0.4 : 0) + (Math.random() - 0.5) * 0.3).toFixed(1)),
-                ibi: 0.0 // Backend sẽ tính hoặc gửi tạm
-            };
-        }
-
-        // --- BƯỚC 2: RENDER LOGIC (DRAW CANVAS & CARDS) ---
-        function renderChart(viewEndIndex) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (dataBuffer.length < 2) return;
-
-            const windowSize = 60;
-            const endIndex = Math.min(viewEndIndex, dataBuffer.length - 1);
-            const startIndex = Math.max(0, endIndex - windowSize);
-            const visibleData = dataBuffer.slice(startIndex, endIndex + 1);
-
-            const width = canvas.width;
-            const height = canvas.height;
-            const padding = 30;
-
-            const edaValues = visibleData.map(d => d.eda);
-            const minY = 0;
-            const maxY = Math.max(12, Math.max(...edaValues) + 2);
-
-            // 1. Red Overlay Band (Stress Window)
-            visibleData.forEach((pt, i) => {
-                if (pt.isStress && i > 0) {
-                    const x1 = padding + ((i - 1) / (windowSize - 1)) * (width - 2 * padding);
-                    const x2 = padding + (i / (windowSize - 1)) * (width - 2 * padding);
-                    ctx.fillStyle = 'rgba(239, 68, 68, 0.25)';
-                    ctx.fillRect(x1, padding, x2 - x1, height - 2 * padding);
-                }
-            });
-
-            // 2. Grid Lines
-            ctx.strokeStyle = '#334155';
-            ctx.lineWidth = 0.5;
-            for (let i = 0; i <= 4; i++) {
-                const y = padding + (i / 4) * (height - 2 * padding);
-                ctx.beginPath();
-                ctx.moveTo(padding, y);
-                ctx.lineTo(width - padding, y);
-                ctx.stroke();
-            }
-
-            // 3. EDA Signal Line
-            ctx.strokeStyle = '#38bdf8';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            visibleData.forEach((pt, i) => {
-                const x = padding + (i / (windowSize - 1)) * (width - 2 * padding);
-                const y = height - padding - ((pt.eda - minY) / (maxY - minY)) * (height - 2 * padding);
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            });
-            ctx.stroke();
-
-            // 4. Update UI Metric Cards (Đã sửa lỗi DataBuffer thành dataBuffer)
-            const currentPt = dataBuffer[endIndex];
-            if (currentPt) {
-                document.getElementById('val-eda').innerText = `${currentPt.eda.toFixed(2)} µS`;
-                document.getElementById('val-hr').innerText = `${currentPt.hr} BPM`;
-                document.getElementById('val-bvp').innerText = currentPt.bvp.toFixed(2);
-                document.getElementById('val-accelerometer').innerText = `${currentPt.accelerometer.toFixed(2)} g`;
-                document.getElementById('val-temperature').innerText = `${currentPt.temperature.toFixed(1)} °C`;
-                document.getElementById('val-ibi').innerText = `${currentPt.ibi} ms`;
-
-                const stressElement = document.getElementById('val-stress');
-                if (currentPt.isStress) {
-                    stressElement.innerText = "STRESS DETECTED";
-                    stressElement.style.color = "var(--accent-red)";
-                } else {
-                    stressElement.innerText = "NORMAL";
-                    stressElement.style.color = "var(--accent-green)";
-                }
-                document.getElementById('time-display').innerText = `View Time: ${currentPt.timestamp}s`;
-            }
-        }
-
-        // --- SCRUBBING & TIME SLIDER LOGIC ---
-        const slider = document.getElementById('timeSlider');
-        const btnToggleLive = document.getElementById('btn-toggle-live');
-
-        function updateSlider() {
-            slider.max = dataBuffer.length - 1;
-            if (isLive) {
-                slider.value = dataBuffer.length - 1;
-            }
-            document.getElementById('slider-time-label').innerText = `${slider.value}s`;
-        }
-
-        slider.addEventListener('input', (e) => {
-            isLive = false;
-            btnToggleLive.innerText = "GO LIVE";
-            btnToggleLive.classList.remove('btn-live');
-            const targetIndex = parseInt(e.target.value);
-            document.getElementById('slider-time-label').innerText = `${targetIndex}s`;
-            renderChart(targetIndex);
-        });
-
-        btnToggleLive.addEventListener('click', () => {
-            isLive = true;
-            btnToggleLive.innerText = "LIVE";
-            btnToggleLive.classList.add('btn-live');
-            slider.value = dataBuffer.length - 1;
-            renderChart(dataBuffer.length - 1);
-        });
-
-        // --- BƯỚC 3: WEBSOCKET REAL-TIME ENGINE ---
-        const patientId = "Part101C";
-        const ws = new WebSocket(`ws://localhost:3000/ws/patients/${patientId}`);
-
-        ws.onopen = () => {
-            console.log("WebSocket Connected successfully to FastAPI");
-
-            // Định kỳ 1 giây: Lấy dữ liệu UI -> Gửi qua Backend
-            setInterval(() => {
-                if (ws.readyState === WebSocket.OPEN) {
-                    currentTimeStep++;
-                    const simulatedData = getSensorDataFromUI();
-
-                    // Send JSON string qua WebSocket
-                    ws.send(JSON.stringify(simulatedData));
-                }
-            }, 1000);
-        };
-
-        // Nhận kết quả AI từ Backend -> Cập nhật Dashboard & Chart
-        ws.onmessage = (event) => {
-            const payload = JSON.parse(event.data);
-
-            // Đóng gói dữ liệu trả về từ Backend vào Buffer
-            const newPoint = {
-                timestamp: currentTimeStep,
-                eda: payload.metrics.eda,
-                hr: payload.metrics.hr,
-                bvp: payload.metrics.bvp,
-                accelerometer: payload.metrics.acc,
-                temperature: payload.metrics.temp,
-                ibi: payload.metrics.ibi,
-                isStress: payload.prediction.is_stress 
-            };
-
-            dataBuffer.push(newPoint);
-
-            if (dataBuffer.length > MAX_BUFFER_SIZE) {
-                dataBuffer.shift();
-            }
-
-            slider.disabled = false;
-            updateSlider();
-
-            if (isLive) {
-                renderChart(dataBuffer.length - 1);
-            }
-        };
-
-        ws.onerror = (error) => {
-            console.error("WebSocket Error:", error);
-        };
-
-        ws.onclose = () => {
-            console.warn("WebSocket Connection Closed");
-        };
-    </script>
+    <script src="app.js"></script>
+    <script src="websocket.js"></script>
 </body>
 
 </html>
