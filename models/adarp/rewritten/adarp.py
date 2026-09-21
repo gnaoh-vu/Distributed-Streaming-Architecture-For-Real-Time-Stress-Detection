@@ -23,7 +23,6 @@ class Signal():
     def end_time(self):
         return self.start_time + (len(self.data) / self.freq)  
 
-SENSOR_DATA_PATH = '../ADARP/Sensor Data'
 PARTICIPANTS = [
     'Part 101C',
     'Part 102C',
@@ -92,31 +91,32 @@ def get_segments_around_tags(signal: Signal, timestamps: list) -> list[Signal]:
 
 def get_segments_outside_tags(signal: Signal, timestamps: list) -> list[Signal]:
     n_obs = int(STRESSED_BUFFER * signal.freq)
-    indices = [0, len(signal.data) - 1]
-    segments = []
+    mask = np.zeros(len(signal.data), dtype=bool)
 
     for timestamp in timestamps:
         diff = int(timestamp - signal.start_time)
         index = int(diff * signal.freq)
-        r_bound =  index + n_obs
-        l_bound =  index - n_obs
-        indices.insert(-1, l_bound)
-        indices.insert(-1, r_bound)
+        l_bound =  max(0, index - n_obs)
+        r_bound =  min(len(signal.data), index + n_obs)
+        mask[l_bound:r_bound] = True
 
-    for i in range(0, len(indices), 2):
-        if (indices[i] < indices[i + 1]):
+    segments = []
+    slices = np.ma.clump_unmasked(np.ma.masked_array(signal.data, mask=mask))
+
+    for s in slices:
+        if (s.stop - s.start) >= (WINDOW_LENGTH * signal.freq):
             segments.append(Signal(
                 signal.start_time,
                 signal.freq,
-                signal.data[indices[i] : indices[i + 1]],
+                signal.data[s.start : s.stop],
                 signal.s_type
             ))
 
     return segments
 
 def get_segments(
-        include_signal_types: list[SignalType], is_stress=True, 
-        from_patient=0, to_patient=len(PARTICIPANTS)
+        path:str, include_signal_types: list[SignalType], is_stress=True, 
+        from_patient=None, to_patient=None
 ) -> tuple[
         dict[str, dict[str, list[Signal]]],     
         dict[str, list[Signal]]
@@ -125,16 +125,22 @@ def get_segments(
         print('No signals were included')
         return
 
+    from_patient = 0 if not from_patient else from_patient
+    to_patient = len(os.listdir(path)) - 1 if not to_patient else to_patient
+
     participants_signals = {p: {} for p in PARTICIPANTS}
     all_signals = { 'HR': [], 'EDA': [], 'BVP': [], 'ACC': [], 'TEMP': [] }
     f = get_segments_around_tags if is_stress else get_segments_outside_tags
 
-    for p in PARTICIPANTS[from_patient:to_patient]:
-        p_invalid = 0
-        p_folder = os.path.join(SENSOR_DATA_PATH, p)
+    for idx, p in enumerate(sorted(os.listdir(path))):
+        if idx < from_patient or idx > to_patient: continue
+
+        p_folder = os.path.join(path, p)
         p_segments = { 'HR': [], 'EDA': [], 'BVP': [], 'ACC': [], 'TEMP': [] }
 
         for folder in os.listdir(p_folder):
+            if not os.path.isdir(os.path.join(p_folder, folder)): continue
+
             data_folder = os.path.join(p_folder, folder)
             timestamps = read_tag_timestamps(data_folder)
 
@@ -147,13 +153,13 @@ def get_segments(
 
         if (SignalType.EDA in include_signal_types):
             for s in p_segments['EDA']:
-                min_max_scaler(s)
                 butter_lpf(
                     s, 
-                    order=4, 
+                    order=2, 
                     fs=FREQ[str(SignalType.EDA)], 
                     cutoff=5/FREQ[str(SignalType.EDA)]
                 )
+                min_max_scaler(s)
 
         participants_signals[p] = p_segments
         for k, v in p_segments.items(): all_signals[k].extend(v)
@@ -191,7 +197,7 @@ def min_max_scaler(segment: Signal):
   segment.data /= np.max(segment.data)
 
 def butter_lpf(segment: Signal, order, fs, cutoff):
-    b, a = butter(order, cutoff, btype='lowpass', fs=fs)
+    b, a = butter(order, cutoff, btype='lowpass', fs=fs, analog=False)
     filtered = lfilter(b, a, segment.data)
     segment.data = filtered
 

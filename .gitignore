@@ -1,12 +1,14 @@
 .env
 .venv
-emqx-cluster/*/data/*
-emqx-cluster/*/log/*
-kafka-tutorial/
-kafka-cluster/*/data/*
-spark-cluster/datanode/data/*
-spark-cluster/namenode/data/*
+__pycache__/
+clusters/emqx-cluster/*/data/*
+clusters/emqx-cluster/*/log/*
+clusters/kafka-tutorial/
+clusters/kafka-cluster/*/data/*
+clusters/spark-cluster/datanode/data/*
+clusters/spark-cluster/namenode/data/*
 models/adarp/ADARP
+models/adarp/WESAD
 models/adarp/origin
 refs/*
 

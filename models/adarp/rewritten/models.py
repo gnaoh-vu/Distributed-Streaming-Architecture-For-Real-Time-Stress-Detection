@@ -1,61 +1,26 @@
 import os
+import random
 import numpy as np
 
 import torch
 from torch import nn
 from torch import optim
 from torch.utils.data import DataLoader, TensorDataset
+from sklearn.metrics import f1_score, balanced_accuracy_score, recall_score, roc_auc_score
 
-from adarp import SignalType, Signal, PARTICIPANTS
-from adarp import get_segments, extract_windows_from_signal
+from .adarp import SignalType, Signal, PARTICIPANTS
+from .adarp import get_segments, extract_windows_from_signal
 
 MODEL_SAVING_PATH = '../../baseline'
-BATCH_SIZE = 147
 
-def prepare_data(
-        include_signals_types: list[SignalType], 
-        from_patient=0, to_patient=len(PARTICIPANTS)
-):
-    _, stress = get_segments(
-        include_signals_types, 
-        from_patient=from_patient, to_patient=to_patient
-    )
-    _, not_stress = get_segments(
-        include_signals_types, is_stress=False, 
-        from_patient=from_patient, to_patient=to_patient
-    )
+WESAD_SENSOR_DATA_PATH = '../WESAD'
+ADARP_SENSOR_DATA_PATH = '../ADARP/Sensor Data'
 
-    data = { 'HR': (), 'EDA': (), 'BVP': (), 'ACC': (), 'TEMP': () }
+EPOCHES = 50
+BATCH_SIZE = 100
+LEARNING_RATE = 0.01157
 
-    for s_type in include_signals_types:
-        stress_signals = extract_windows_from_signal(stress[str(s_type)])
-        not_stress_signals = extract_windows_from_signal(not_stress[str(s_type)])
-
-        X_stress = torch.from_numpy(
-            np.stack([s.data for s in stress_signals])
-        )
-
-        X_not_stress = torch.from_numpy(
-            np.stack([s.data for s in not_stress_signals])
-        )
-
-        X = torch.cat([X_stress, X_not_stress], dim=0)
-        y = torch.cat([
-            torch.ones(len(X_stress), dtype=int),
-            torch.zeros(len(X_not_stress), dtype=int)
-        ], dim=0)
-
-        data[str(s_type)] = (X, y)
-
-    return data
-
-train = prepare_data([SignalType.EDA], to_patient=9)
-val = prepare_data([SignalType.EDA], from_patient=9)
- 
-X_eda_train, y_eda_train = train['EDA']
-X_eda_val, y_eda_val = val['EDA']
-
-class StressModel(nn.Module):
+class SupervisedBalanceAdarpModel(nn.Module):
     def __init__(self):
         super().__init__()
         self.cnn = nn.Sequential(
@@ -65,7 +30,7 @@ class StressModel(nn.Module):
             nn.Conv1d(100, 50, kernel_size=10, padding='same'),
             nn.ReLU(),
 
-            nn.MaxPool1d(kernel_size=240),
+            nn.AdaptiveMaxPool1d(1)
         )
 
         self.ffw = nn.Sequential(
@@ -88,26 +53,124 @@ class StressModel(nn.Module):
         x = self.ffw(x)
         return x
 
+class SupervisedFullAdarpModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.cnn = nn.Sequential(
+            nn.Conv1d(1, 250, kernel_size=5, padding='same'),
+            nn.ReLU(),
+
+            nn.Conv1d(250, 100, kernel_size=5, padding='same'),
+            nn.ReLU(),
+
+            nn.AdaptiveMaxPool1d(1)
+        )
+
+        self.ffw = nn.Sequential(
+            nn.Linear(100, 256), nn.ReLU(),
+            nn.Dropout(p=0.1),
+
+            nn.Linear(256, 128), nn.ReLU(),
+            nn.Dropout(p=0.1),
+
+            nn.Linear(128, 64),
+            nn.ReLU(),
+
+            nn.Linear(64, 2)
+        )
+
+    def forward(self, x):
+        x = x.unsqueeze(1)
+        x = self.cnn(x)
+        x = x.squeeze(2)
+        x = self.ffw(x)
+        return x
+
+
+def prepare_data(
+        path:str, include_signals_types: list[SignalType], 
+        from_patient=None, to_patient=None,
+        undersampling=False
+):
+    _, stress = get_segments(
+        path, include_signals_types, 
+        from_patient=from_patient, to_patient=to_patient
+    )
+    _, not_stress = get_segments(
+        path, include_signals_types, is_stress=False, 
+        from_patient=from_patient, to_patient=to_patient
+    )
+
+    data = { 'HR': (), 'EDA': (), 'BVP': (), 'ACC': (), 'TEMP': () }
+
+    for s_type in include_signals_types:
+        stress_signals = extract_windows_from_signal(stress[str(s_type)])
+        not_stress_signals = extract_windows_from_signal(not_stress[str(s_type)])
+
+        if undersampling:
+            not_stress_signals = random.sample(not_stress_signals, len(stress_signals))
+
+        X_stress = torch.from_numpy(
+            np.stack([s.data for s in stress_signals])
+        )
+
+        X_not_stress = torch.from_numpy(
+            np.stack([s.data for s in not_stress_signals])
+        )
+
+        X = torch.cat([X_stress, X_not_stress], dim=0)
+        y = torch.cat([
+            torch.ones(len(X_stress), dtype=int),
+            torch.zeros(len(X_not_stress), dtype=int)
+        ], dim=0)
+
+        data[str(s_type)] = (X, y)
+
+    return data
+
+def evaluate(y_logits, y):
+    # prob = torch.sigmoid(y_logits).numpy()
+    # pred_y = (prob >= 0.5).astype(int)
+    pred_y = torch.argmax(y_logits.softmax(dim=1), dim=1).numpy()
+    y = y.numpy()
+
+    print(pred_y.shape, y.shape)
+
+    metrics = {
+        'f1': f1_score(y, pred_y, average='macro'),
+        'balanced_acc': balanced_accuracy_score(y, pred_y),
+        'stress_recall': recall_score(y, pred_y, pos_label=1),
+        'non_stress_recall': recall_score(y, pred_y, pos_label=0),
+        # 'roc_auc': roc_auc_score(y, prob)
+    }
+
+    return metrics
+
 def validate(val_loader, model, loss_fn):
     total_samples = len(val_loader.dataset)
-    correct_labels = 0
+    all_logits = []
+    all_labels = []
     total_loss = 0
-    model.eval()
 
+    model.eval()
     with torch.no_grad():
         for batch, (X, y) in enumerate(val_loader):
             logits = model(X)
-            logits = logits.squeeze(1)
+            all_logits.append(logits)
+            all_labels.append(y)
 
-            loss = loss_fn(logits, y.float())
-            total_loss += loss.item() * len(X)
+            loss = loss_fn(logits, y)
+            total_loss += loss.item() * len(y)
 
-            correct_labels += ((logits > 0) == y).sum().item()
+    all_logits = torch.cat(all_logits, dim=0)
+    all_labels = torch.cat(all_labels, dim=0)
 
-    avg_loss = total_loss / total_samples
-    accuracy = correct_labels / total_samples
+    avg_metrics = {
+        'loss': total_loss / total_samples,
+        **evaluate(all_logits, all_labels)
+    }
 
-    return avg_loss, accuracy
+    return avg_metrics
 
 def train(train_loader, model, loss_fn, optimizer, epoches=1, val_loader=None, patience=3):
     size = len(train_loader.dataset)
@@ -121,7 +184,7 @@ def train(train_loader, model, loss_fn, optimizer, epoches=1, val_loader=None, p
 
         for batch, (X, y) in enumerate(train_loader):
             logits = model(X)
-            loss = loss_fn(logits.squeeze(1), y.float())
+            loss = loss_fn(logits, y)
 
             global_step += 1
 
@@ -140,8 +203,9 @@ def train(train_loader, model, loss_fn, optimizer, epoches=1, val_loader=None, p
                 )
 
         if val_loader:
-            val_loss, accuracy = validate(val_loader, model, loss_fn) 
-            print(f'val_loss: {val_loss:>7f}, accuracy: {accuracy}')
+            avg_metrics = validate(val_loader, model, loss_fn) 
+            val_loss =avg_metrics['loss']
+            print(avg_metrics)
 
             if best_val_loss is None or val_loss < best_val_loss:
                 patience_count = 0
@@ -155,21 +219,21 @@ def train(train_loader, model, loss_fn, optimizer, epoches=1, val_loader=None, p
                     break
 
 
-training_data = TensorDataset(X_eda_train, y_eda_train)
-val_data = TensorDataset(X_eda_val, y_eda_val)
+if __name__ == '__main__':
+    train_ = prepare_data(ADARP_SENSOR_DATA_PATH, [SignalType.EDA], to_patient=0, undersampling=True)
+    val_ = prepare_data(ADARP_SENSOR_DATA_PATH, [SignalType.EDA], to_patient=0, from_patient=0)
 
-train_loader = DataLoader(training_data, batch_size=BATCH_SIZE, shuffle=True)
-val_loader = DataLoader(val_data, batch_size=BATCH_SIZE)
+    X_eda_train, y_eda_train = train_['EDA']
+    X_eda_val, y_eda_val = val_['EDA']
 
-model = StressModel()
-loss_fn = nn.BCEWithLogitsLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.002558)
+    training_data = TensorDataset(X_eda_train, y_eda_train)
+    val_data = TensorDataset(X_eda_val, y_eda_val)
 
-train(train_loader, model, loss_fn, optimizer, epoches=50, patience=5, val_loader=val_loader)
+    train_loader = DataLoader(training_data, batch_size=BATCH_SIZE, shuffle=True)
+    val_loader = DataLoader(val_data, batch_size=BATCH_SIZE)
 
+    model = SupervisedFullAdarpModel()
 
-
-
-
-
-
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    train(train_loader, model, loss_fn, optimizer, epoches=EPOCHES, patience=10, val_loader=val_loader)
