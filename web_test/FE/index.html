@@ -7,7 +7,9 @@
     <title>IoT Stress Real-time Monitoring Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg-color: #ffffff;
@@ -75,9 +77,17 @@
         }
 
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.2; }
-            100% { opacity: 1; }
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.2;
+            }
+
+            100% {
+                opacity: 1;
+            }
         }
 
         .dashboard-grid {
@@ -197,7 +207,7 @@
             height: 300px;
         }
 
-        canvas {
+        #signalChart {
             width: 100%;
             height: 100%;
             border: 1px solid var(--border-color);
@@ -317,7 +327,7 @@
                 </div>
 
                 <div class="chart-container">
-                    <canvas id="signalChart"></canvas>
+                    <div id="signalChart" aria-label="Real-time EDA signal chart"></div>
                 </div>
 
                 <!-- Scrubbing Controls -->
@@ -337,6 +347,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
     <script src="app.js"></script>
     <script src="websocket.js"></script>
 </body>
