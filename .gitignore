@@ -9,6 +9,5 @@ clusters/spark-cluster/datanode/data/*
 clusters/spark-cluster/namenode/data/*
 models/data/ADARP
 models/data/WESAD
-
 refs/*
 ADARP/*
