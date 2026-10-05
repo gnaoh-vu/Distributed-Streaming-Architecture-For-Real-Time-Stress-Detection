@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Stress Real-time Monitoring Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --panel-face: #fafafa;
+            --text-main: #16181c;
+            --text-sub: #8a8f98;
+            --border-color: #e3e5e8;
+
+            --accent-blue: #2b6f76;
+            --accent-green: #2f7d4f;
+            --accent-red: #c0392b;
+            --accent-amber: #a9720d;
+            --accent-violet: #6952b3;
+            --accent-orange: #b05a1f;
+            --accent-rose: #a3486b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+        }
+
+        header h2 {
+            font-weight: 600;
+            font-size: 1.2rem;
+            letter-spacing: 0.01em;
+        }
+
+        .status-badge {
+            font-family: "IBM Plex Mono", monospace;
+            color: var(--text-sub);
+            font-size: 0.78rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.2;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 22px;
+            flex: 1;
+        }
+
+        .patient-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-self: start;
+        }
+
+        .patient-list h3 {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-sub);
+            padding-bottom: 10px;
+            margin-bottom: 4px;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: none;
+        }
+
+        .patient-card {
+            background: var(--card-bg);
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-left: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .patient-card strong {
+            font-family: "IBM Plex Mono", monospace;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .patient-card p {
+            margin-top: 3px;
+            font-size: 0.78rem;
+            color: var(--text-sub);
+        }
+
+        .patient-card.active {
+            border-left-color: var(--accent-blue);
+        }
+
+        .patient-card.stress {
+            border-left-color: var(--accent-red);
+        }
+
+        .patient-card.stress p {
+            color: var(--accent-red);
+        }
+
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .metric-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+            border-top: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            padding: 14px 16px;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .metric-label {
+            color: var(--text-sub);
+            font-size: 0.72rem;
+            line-height: 1.3;
+            display: block;
+        }
+
+        .metric-value {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-top: 6px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .chart-card h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        #time-display {
+            font-family: "IBM Plex Mono", monospace;
+            color: var(--text-sub);
+            font-size: 0.78rem;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        #signalChart {
+            width: 100%;
+            height: 100%;
+            border: 1px solid var(--border-color);
+            background-color: #ffffff;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            font-family: "IBM Plex Mono", monospace;
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 7px 14px;
+            font-weight: 500;
+            font-size: 0.78rem;
+            cursor: pointer;
+        }
+
+        .btn-live {
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .slider-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--text-main);
+        }
+
+        #slider-time-label {
+            font-family: "IBM Plex Mono", monospace;
+            color: var(--text-main);
+        }
+
+        @media (max-width: 720px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h2>IoT Stress Real-time Monitoring</h2>
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            <span>Simulator connected</span>
+        </div>
+    </header>
+
+    <div class="dashboard-grid">
+        <!-- Patient Selector List -->
+        <div class="patient-list">
+            <h3>Danh sách Bệnh nhân</h3>
+            <div class="patient-card active" id="card-p1">
+                <strong>Part 101C</strong>
+                <p>Status: Normal</p>
+            </div>
+            <div class="patient-card stress" id="card-p2">
+                <strong>Part 102C</strong>
+                <p>Status: STRESS DETECTED</p>
+            </div>
+        </div>
+
+        <!-- Main Realtime Tracking Panel -->
+        <div class="main-panel">
+            <div class="metric-cards">
+                <div class="metric-card">
+                    <span class="metric-label">EDA (Electrodermal Activity)</span>
+                    <div class="metric-value" id="val-eda" style="color: var(--accent-blue);">0.00 µS</div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Heart Rate</span>
+                    <div class="metric-value" id="val-hr" style="color: var(--accent-green);">0 BPM</div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Blood Volume Pulse</span>
+                    <div class="metric-value" id="val-bvp" style="color: var(--accent-amber);">0.00</div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Accelerometer</span>
+                    <div class="metric-value" id="val-accelerometer" style="color: var(--accent-violet);">0.00 g</div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Temperature</span>
+                    <div class="metric-value" id="val-temperature" style="color: var(--accent-orange);">0.0 °C</div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Inter-beat Interval</span>
+                    <div class="metric-value" id="val-ibi" style="color: var(--accent-rose);">0 ms</div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">AI Prediction (Current Window)</span>
+                    <div class="metric-value" id="val-stress" style="color: var(--accent-green);">NORMAL</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Real-time Signal Track (EDA & Stress Window)</h3>
+                    <span id="time-display">Live: 0s</span>
+                </div>
+
+                <div class="chart-container">
+                    <div id="signalChart" aria-label="Real-time EDA signal chart"></div>
+                </div>
+
+                <!-- Scrubbing Controls -->
+                <div class="controls">
+                    <button class="btn btn-live" id="btn-toggle-live">LIVE</button>
+                    <div class="slider-container">
+                        <input type="range" id="timeSlider" min="0" max="0" value="0" disabled>
+                        <div
+                            style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-sub);">
+                            <span>T-Minus Max</span>
+                            <span id="slider-time-label">0s</span>
+                            <span>NOW</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <script src="app.js"></script>
+    <script src="websocket.js"></script>
+</body>
+
+</html>

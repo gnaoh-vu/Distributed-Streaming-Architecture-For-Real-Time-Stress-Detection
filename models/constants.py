@@ -17,5 +17,5 @@ OVERLAP_RATIO = 0.5
 
 MODEL_SAVING_PATH = './saved_states'
 
-WESAD_SENSOR_DATA_PATH = './data/WESAD'
-ADARP_SENSOR_DATA_PATH = '.data/ADARP/Sensor Data'
+WESAD_SENSOR_DATA_PATH = './models/data/WESAD'
+ADARP_SENSOR_DATA_PATH = './models/data/ADARP/Sensor Data'

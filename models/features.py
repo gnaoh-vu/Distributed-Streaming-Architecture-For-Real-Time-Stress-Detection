@@ -1,21 +1,22 @@
 import numpy as np
 from bisect import bisect_left, bisect_right
 
-from .signal import extract_windows_from_segment_list
+from .adarp import extract_windows_from_segment_list
 
 def extract_hrv_and_eda(all_segment_lists: dict[str, list], all_p_baselines=None):
   all_hrv_features = []
   all_eda_features = []
+  all_p_ids = []
 
   for i in range(len(all_segment_lists['EDA'])):
     eda_segment_list = all_segment_lists['EDA'][i]
     ibi = all_segment_lists['IBI'][i]
 
+    p = all_segment_lists['EDA'][i][0].participant
     windows = extract_windows_from_segment_list(eda_segment_list)
     eda_features, hrv_features = extract_hrv_and_eda_features_from_eda_windows(windows, ibi)
 
     if all_p_baselines is not None and len(eda_features) != 0:
-      p = all_segment_lists['EDA'][i][0].participant
       p_baseline = all_p_baselines[p]
 
       eda_features = np.array(eda_features)
@@ -26,8 +27,9 @@ def extract_hrv_and_eda(all_segment_lists: dict[str, list], all_p_baselines=None
 
     all_eda_features.extend(eda_features)
     all_hrv_features.extend(hrv_features)
+    all_p_ids.extend([p] * len(eda_features))
 
-  return all_eda_features, all_hrv_features
+  return all_eda_features, all_hrv_features, all_p_ids
 
 def extract_hrv_and_eda_features_from_eda_windows(windows, ibi):
   eda_features_list, hrv_features_list = [], []

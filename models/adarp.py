@@ -2,10 +2,9 @@ import os
 import csv
 
 import numpy as np
-from enum import StrEnum
 from scipy.signal import butter, filtfilt, lfilter
 
-from .constant import *
+from .constants import *
 from .signal import *
 
 def read_signal_data(s_type: SignalType, path: str) -> Signal:
