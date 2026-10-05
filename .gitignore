@@ -7,8 +7,8 @@ clusters/kafka-tutorial/
 clusters/kafka-cluster/*/data/*
 clusters/spark-cluster/datanode/data/*
 clusters/spark-cluster/namenode/data/*
-models/adarp/ADARP
-models/adarp/WESAD
-models/adarp/origin
+models/data/ADARP
+models/data/WESAD
+
 refs/*
 ADARP/*
