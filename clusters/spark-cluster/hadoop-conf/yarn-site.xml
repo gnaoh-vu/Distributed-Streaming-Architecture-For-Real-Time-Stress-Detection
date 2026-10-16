@@ -6,6 +6,11 @@
     </property>
 
     <property>
+        <name>yarn.log-aggregation-enable</name>
+        <value>true</value>
+    </property>
+
+    <property>
 	<name>yarn.resourcemanager.scheduler.class</name>
 	<value>org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler</value>
     </property>

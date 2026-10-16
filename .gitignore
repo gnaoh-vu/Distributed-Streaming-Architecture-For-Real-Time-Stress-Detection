@@ -1,5 +1,7 @@
 .env
 .venv
+*.tar.gz
+venv3.11/
 __pycache__/
 clusters/emqx-cluster/*/data/*
 clusters/emqx-cluster/*/log/*
@@ -7,8 +9,10 @@ clusters/kafka-tutorial/
 clusters/kafka-cluster/*/data/*
 clusters/spark-cluster/datanode/data/*
 clusters/spark-cluster/namenode/data/*
+clusters/spark-cluster/namenode/data/*
 models/data/ADARP
 models/data/WESAD
+target
 
 refs/*
 

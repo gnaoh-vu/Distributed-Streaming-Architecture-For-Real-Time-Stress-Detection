@@ -151,6 +151,7 @@ candidates = {
     'tuned':      lambda: RandomForestClassifier(**search.best_params_, n_jobs=-1, random_state=42),
 }
 
+model_fn = lambda: RandomForestClassifier(**search.best_params_, n_jobs=-1, random_state=42)
 for name, model_fn in candidates.items():
     print('-'*20 + name + '-'*20)
     metrics, thresholds = run_loso(model_fn)
