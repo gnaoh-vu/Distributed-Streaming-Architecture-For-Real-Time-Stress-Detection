@@ -1,5 +1,5 @@
 services:
-  emqx-core-1:
+  emqx-broker:
     image: emqx/emqx
     ports:
       - 18083:18083
@@ -17,12 +17,7 @@ services:
       project-network:
         aliases:
         - core1.emqx.io
-      iot-emqx-net:
-        aliases:
-        - emqx-broker
 
 networks:
   project-network:
-    external: true
-  iot-emqx-net:
     external: true
