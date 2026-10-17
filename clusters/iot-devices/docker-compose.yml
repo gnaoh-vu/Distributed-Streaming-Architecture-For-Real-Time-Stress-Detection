@@ -1,54 +1,65 @@
 services:
   iot-1:
-    image:
+    build: .
+    container_name: iot-1
+    environment:
+      - MQTT_HOST=emqx-broker
+      - MQTT_PORT=1883
+      - MQTTT_CLIENT_ID=iot-device-1
+    networks:
+      - kafka-net
+      - iot-emqx-net
     volumes:
       - ./iot-1/data:/data
+      - ./iot-1/control:/control
 
-  iot-2:
-    image:
-    volumes:
-      - ./iot-2/data:/data
+  # iot-2:
+  #   image:
+  #   volumes:
+  #     - ./iot-2/data:/data
 
-  iot-3:
-    image:
-    volumes:
-      - ./iot-3/data:/data
+  # iot-3:
+  #   image:
+  #   volumes:
+  #     - ./iot-3/data:/data
 
-  iot-4:
-    image:
-    volumes:
-      - ./iot-4/data:/data
+  # iot-4:
+  #   image:
+  #   volumes:
+  #     - ./iot-4/data:/data
 
-  iot-5:
-    image:
-    volumes:
-      - ./iot-5/data:/data
+  # iot-5:
+  #   image:
+  #   volumes:
+  #     - ./iot-5/data:/data
 
-  iot-6:
-    image:
-    volumes:
-      - ./iot-6/data:/data
+  # iot-6:
+  #   image:
+  #   volumes:
+  #     - ./iot-6/data:/data
 
-  iot-7:
-    image:
-    volumes:
-      - ./iot-7/data:/data
+  # iot-7:
+  #   image:
+  #   volumes:
+  #     - ./iot-7/data:/data
 
-  iot-8:
-    image:
-    volumes:
-      - ./iot-8/data:/data
+  # iot-8:
+  #   image:
+  #   volumes:
+  #     - ./iot-8/data:/data
 
-  iot-9:
-    image:
-    volumes:
-      - ./iot-9/data:/data
+  # iot-9:
+  #   image:
+  #   volumes:
+  #     - ./iot-9/data:/data
 
-  iot-1000000000:
-    image:
-    volumes:
-      - ./iot-10/data:/data
+  # iot-1000000000:
+  #   image:
+  #   volumes:
+  #     - ./iot-10/data:/data
 
 networks:
   kafka-net:
+    external: true
+  iot-emqx-net:
     external: true
