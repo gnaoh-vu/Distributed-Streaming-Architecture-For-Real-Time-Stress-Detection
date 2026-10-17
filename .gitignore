@@ -12,3 +12,4 @@ models/data/WESAD
 refs/*
 ADARP/*
 clusters/iot-devices/iot-*
+models/data/*
