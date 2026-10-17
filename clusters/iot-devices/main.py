@@ -22,6 +22,14 @@ NEXT_FILE = CONTROL_DIR / "next"
 SIMULATION_SPEED = 1.0
 METRICS = ("EDA", "IBI")
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s",
+    datefmt="%H:%M:%S",
+)
+
+logger = logging.getLogger("iot-simulator")
+
 def create_mqtt_client():
 
     client = mqtt.Client(
@@ -33,6 +41,7 @@ def create_mqtt_client():
     client.on_disconnect = on_disconnect
     client.on_publish = on_publish
     client.on_pre_connect = on_connect_fail
+
     client.connect(
         host=MQTT_HOST,
         port=MQTT_PORT,
@@ -41,6 +50,43 @@ def create_mqtt_client():
     client.loop_start()
 
     return client
+
+def on_connect(client, userdata, flags, reason_code, properties=None):
+    if reason_code == 0:
+        logger.info("Connected to EMQX")
+    else:
+        broker_msg = getattr(properties, "ReasonString", "N/A") if properties else "N/A"
+        logger.error(
+            "Connection failed: %s (code=%s, broker_msg='%s')",
+            reason_code,
+            reason_code.value,
+            broker_msg,
+        )
+
+def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None):
+    if reason_code == 0:
+        logger.info("MQTT disconnected normally")
+    else:
+        broker_msg = getattr(properties, "ReasonString", "N/A") if properties else "N/A"
+        logger.warning(
+            "MQTT disconnected unexpectedly: %s (code=%s)",
+            reason_code,
+            reason_code.value,
+        )
+
+def on_publish(client, userdata, mid, reason_code, properties=None):
+    if reason_code == 0 or reason_code.value == 0:
+        logger.info("Publish acknowledged, batch number: mid=%s", mid)
+    else:
+        logger.error(
+            "Publish failed: mid=%s, reason=%s (code=%s)",
+            mid,
+            reason_code,
+            reason_code.value,
+        )
+
+def on_connect_fail(client, userdata):
+    logger.error("MQTT socket/network layer connection failed (broker unreachable)")
 
 
 def publish_batch(mqtt_client, record_dir, second, batch):
@@ -62,36 +108,17 @@ def publish_batch(mqtt_client, record_dir, second, batch):
         qos=1,
     )
 
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(message)s",
-    datefmt="%H:%M:%S",
-)
-
-logger = logging.getLogger("iot-simulator")
-
-if SIMULATION_SPEED <= 0:
-    raise ValueError("Larger than 0")
-
-
-
 def find_records() -> list[Path]:
     if not DATA_DIR.is_dir():
         raise FileNotFoundError("Not found {DATA_DIR}")
 
     records = (p for p in DATA_DIR.iterdir() if p.is_dir())
-    
-    records = sorted(
-        (p for p in DATA_DIR.iterdir() if p.is_dir()),
-        key= lambda x: x.name.split('_')[1])
-
+    records = sorted( records, key= lambda x: x.name.split('_')[1])
 
     if not records:
         raise RuntimeError("No records {DATA_DIR}")
 
     return records
-
 
 def read_eda(path: Path) -> Iterator[tuple[float,str,float]]:
     with path.open("r",newline="",encoding='utf-8') as file:
@@ -103,6 +130,7 @@ def read_eda(path: Path) -> Iterator[tuple[float,str,float]]:
                     cell = cell.strip()
                     if cell:
                         yield float(cell)
+
         values = numeric_values()
 
         try:
@@ -163,8 +191,7 @@ def read_ibi(path: Path) -> Iterator[tuple[float,str,float]]:
 
             yield relative_time, "IBI", ibi_vals
 
-def stream_data(
-    streams: list[Iterator[tuple[float,str,float]]],) -> Iterator[tuple[float,str,float]]:
+def stream_data(streams: list[Iterator[tuple[float,str,float]]],) -> Iterator[tuple[float,str,float]]:
         iterators = [iter(stream) for stream in streams]
         heads = []
 
@@ -215,7 +242,6 @@ def run_simulation(record_dir: Path, mqtt_client):
     logger.info("Starting Device: %s", record_dir.name)
     logger.info("Simulation Speed: %s", SIMULATION_SPEED)
 
-
     streams = build_stream(record_dir);
     events = stream_data(streams)
 
@@ -225,6 +251,7 @@ def run_simulation(record_dir: Path, mqtt_client):
 
     batch = {"EDA": [], "IBI": []}
     cur_second = None
+
     for relative_time, sensor, values in events:
         if first_time_event is None:
             first_time_event = relative_time
@@ -245,16 +272,17 @@ def run_simulation(record_dir: Path, mqtt_client):
 
         elif cur_second != second:
             publish_batch(
-                  mqtt_client=mqtt_client,
-                  record_dir= record_dir,
-                  second= cur_second,
-                  batch=batch,
-              )
+                mqtt_client=mqtt_client,
+                record_dir= record_dir,
+                second= cur_second,
+                batch=batch,
+            )
+
             logger.info(
-            "Record Device=%s | t=%d | Batch Value=%s",
-            record_dir.name,
-            cur_second,
-            json.dumps(batch,indent=2)        
+                "Record Device=%s | t=%d | Batch Value=%s",
+                record_dir.name,
+                cur_second,
+                json.dumps(batch,indent=2)        
             )
             event_count += 1
 
@@ -263,7 +291,7 @@ def run_simulation(record_dir: Path, mqtt_client):
 
         batch[sensor].append({
             "value":values,     
-            })
+        })
 
     if cur_second is not None:
         logger.info(
@@ -279,12 +307,12 @@ def run_simulation(record_dir: Path, mqtt_client):
         second=cur_second,
         batch=batch,
     )
+
     logger.info(
     "Finished Record: %s | events =%d",
         record_dir.name,
         event_count,
     )
-
 
 def wait_next() -> None:
     logger.info(
@@ -296,44 +324,6 @@ def wait_next() -> None:
 
     NEXT_FILE.unlink()
     logger.info("Command Received")
-
-def on_connect(client, userdata, flags, reason_code, properties=None):
-    if reason_code == 0:
-        logger.info("Connected to EMQX")
-    else:
-        broker_msg = getattr(properties, "ReasonString", "N/A") if properties else "N/A"
-        logger.error(
-            "Connection failed: %s (code=%s, broker_msg='%s')",
-            reason_code,
-            reason_code.value,
-            broker_msg,
-        )
-
-def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None):
-    if reason_code == 0:
-        logger.info("MQTT disconnected normally")
-    else:
-        broker_msg = getattr(properties, "ReasonString", "N/A") if properties else "N/A"
-        logger.warning(
-            "MQTT disconnected unexpectedly: %s (code=%s)",
-            reason_code,
-            reason_code.value,
-        )
-
-def on_publish(client, userdata, mid, reason_code, properties=None):
-    if reason_code == 0 or reason_code.value == 0:
-        logger.info("Publish acknowledged, batch number: mid=%s", mid)
-    else:
-        logger.error(
-            "Publish failed: mid=%s, reason=%s (code=%s)",
-            mid,
-            reason_code,
-            reason_code.value,
-        )
-
-def on_connect_fail(client, userdata):
-    logger.error("MQTT socket/network layer connection failed (broker unreachable)")
-
 
 def main() -> None:
     CONTROL_DIR.mkdir(parents=True, exist_ok=True)
@@ -361,9 +351,6 @@ def main() -> None:
         mqtt_client.disconnect()
         mqtt_client.loop_stop()
         logger.info("All records completed. Simulator is exiting.")
-
-
-
 
 if __name__ == "__main__":
     try:

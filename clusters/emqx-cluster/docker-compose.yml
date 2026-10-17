@@ -1,5 +1,5 @@
 services:
-  emqx-core-1:
+  emqx-broker:
     image: emqx/emqx
     ports:
       - 18083:18083

@@ -7,7 +7,6 @@ services:
       - MQTT_PORT=1883
       - MQTT_CLIENT_ID=iot-device-1
     networks:
-      - kafka-net
       - project-network
     volumes:
       - ./iot-1/data:/data
@@ -154,7 +153,5 @@ services:
       - ./iot-11/control:/control
 
 networks:
-  kafka-net:
-    external: true
   project-network:
     external: true
