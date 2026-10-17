@@ -1,6 +1,6 @@
 services:
   namenode:
-    build: .
+    image: apache/hadoop:3.5.0 
     user: root
     ports:
       - "9870:9870"
@@ -14,13 +14,10 @@ services:
         hdfs namenode
       "
     volumes:
-      - ./namenode/mount:/mount
       - ./namenode/data:/tmp/hadoop-root/dfs/name
       - ./hadoop-conf/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
       - ./hadoop-conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
       - ./hadoop-conf/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
-    networks:
-      - project-network
 
   datanode:
     image: apache/hadoop:3.5.0
@@ -35,8 +32,6 @@ services:
       bash -c "
         hdfs datanode
       "
-    networks:
-      - project-network
   resource-manager:
     image: apache/hadoop:3.5.0 
     ports:
@@ -49,13 +44,9 @@ services:
     volumes:
       - ./hadoop-conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
       - ./hadoop-conf/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
-    networks:
-      - project-network
 
   node-manager-1:
-    build: .
-    ports:
-      - "8041:8042"
+    image: apache/hadoop:3.5.0 
     environment:
       - HADOOP_HOME=/opt/hadoop
       - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
@@ -66,13 +57,9 @@ services:
     volumes:
       - ./hadoop-conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
       - ./hadoop-conf/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
-    networks:
-      - project-network
 
   node-manager-2:
-    build: .
-    ports:
-      - "8042:8042"
+    image: apache/hadoop:3.5.0 
     environment:
       - HADOOP_HOME=/opt/hadoop
       - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
@@ -83,8 +70,6 @@ services:
     volumes:
       - ./hadoop-conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
       - ./hadoop-conf/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
-    networks:
-      - project-network
 
   spark-client:
     image: apache/spark-py
@@ -92,15 +77,10 @@ services:
     environment:
       - HADOOP_HOME=/opt/hadoop
       - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-      - PYSPARK_PYTHON=./environment/bin/python
-      - PATH=/opt/spark/bin:/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     command: tail -F anything
     volumes:
-      - ./jobs:/jobs
       - ./hadoop-conf/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
       - ./hadoop-conf/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
-    networks:
-      - project-network
 
 networks:
   project-network:
