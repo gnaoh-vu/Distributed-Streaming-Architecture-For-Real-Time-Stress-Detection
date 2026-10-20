@@ -19,6 +19,8 @@ DATA_DIR = Path("/data")
 CONTROL_DIR = Path("/control")
 NEXT_FILE = CONTROL_DIR / "next"
 
+print(os.listdir('/data'))
+
 SIMULATION_SPEED = 1.0
 METRICS = ("EDA", "IBI")
 
@@ -91,8 +93,7 @@ def on_connect_fail(client, userdata):
 
 def publish_batch(mqtt_client, record_dir, second, batch):
     device_id = record_dir.name.split("_", 1)[0]
-
-    topic = f"{device_id}/batch"
+    topic = f"sensors/{device_id}"
 
     payload = {
         "device_id": MQTT_CLIENT_ID,
@@ -101,6 +102,8 @@ def publish_batch(mqtt_client, record_dir, second, batch):
         "eda": batch["EDA"],
         "ibi": batch["IBI"],
     }
+
+    logger.info(json.dumps(payload))
 
     mqtt_client.publish(
         topic,
@@ -189,7 +192,7 @@ def read_ibi(path: Path) -> Iterator[tuple[float,str,float]]:
                 )
                 continue
 
-            yield relative_time, "IBI", ibi_vals
+            yield relative_time, "IBI", relative_time
 
 def stream_data(streams: list[Iterator[tuple[float,str,float]]],) -> Iterator[tuple[float,str,float]]:
         iterators = [iter(stream) for stream in streams]
@@ -289,9 +292,7 @@ def run_simulation(record_dir: Path, mqtt_client):
             cur_second = second
             batch = {"EDA": [], "IBI": []}
 
-        batch[sensor].append({
-            "value":values,     
-        })
+        batch[sensor].append(values)
 
     if cur_second is not None:
         logger.info(

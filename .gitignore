@@ -10,7 +10,7 @@ clusters/kafka-cluster/*/data/*
 clusters/spark-cluster/datanode/data/*
 clusters/spark-cluster/namenode/data/*
 clusters/spark-cluster/namenode/data/*
-
+iot-*/
 target
 
 ADARP/

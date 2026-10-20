@@ -5,11 +5,12 @@ services:
     environment:
       - MQTT_HOST=emqx-broker
       - MQTT_PORT=1883
-      - MQTTT_CLIENT_ID=iot-device-1
+      - MQTT_CLIENT_ID=0
     networks:
       - project-network
     volumes:
-      - ./iot-1/data:/data
+      - ./main.py:/app/main.py
+      - ./iot-1/data/Part 101C:/data
       - ./iot-1/control:/control
 
   # iot-2:

@@ -124,6 +124,7 @@ def send_predictions(batch_df, batch_id):
     batch_df.rdd.foreachPartition(send_prediction)
 
 signal_schema = StructType([
+    StructField("device_id", StringType(), True),
     StructField("eda", ArrayType(DoubleType()), True),
     StructField("ibi", ArrayType(DoubleType()), True),
     StructField("timestamp", DoubleType(), True),
@@ -163,7 +164,7 @@ parsed_df = kafka_df.select(
 )
 
 predictions_stream = parsed_df \
-    .groupBy("key") \
+    .groupBy("device_id") \
     .applyInPandasWithState(
         func=aggregateWindow,
         outputStructType=output_schema,
