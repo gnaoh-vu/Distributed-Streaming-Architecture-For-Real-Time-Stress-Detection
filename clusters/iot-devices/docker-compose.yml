@@ -3,7 +3,7 @@ services:
     build: .
     container_name: iot-1
     environment:
-      - MQTT_HOST=emqx-broker
+      - MQTT_HOST=core1.emqx.io
       - MQTT_PORT=1883
       - MQTT_CLIENT_ID=0
     networks:
@@ -14,49 +14,144 @@ services:
       - ./iot-1/control:/control
 
   # iot-2:
-  #   image:
+  #   build: .
+  #   container_name: iot-2
+  #   environment:
+  #     - MQTT_HOST=core1.emqx.io
+  #     - MQTT_PORT=1883
+  #     - MQTT_CLIENT_ID=iot-device-2
+  #   networks:
+  #     - kafka-net
+  #     - project-network
   #   volumes:
   #     - ./iot-2/data:/data
+  #     - ./iot-2/control:/control
 
   # iot-3:
-  #   image:
+  #   build: .
+  #   container_name: iot-3
+  #   environment:
+  #     - MQTT_HOST=core1.emqx.io
+  #     - MQTT_PORT=1883
+  #     - MQTT_CLIENT_ID=iot-device-3
+  #   networks:
+  #     - kafka-net
+  #     - project-network
   #   volumes:
   #     - ./iot-3/data:/data
+  #     - ./iot-3/control:/control
 
   # iot-4:
-  #   image:
+  #   build: .
+  #   container_name: iot-4
+  #   environment:
+  #     - MQTT_HOST=core1.emqx.io
+  #     - MQTT_PORT=1883
+  #     - MQTT_CLIENT_ID=iot-device-4
+  #   networks:
+  #     - kafka-net
+  #     - project-network
   #   volumes:
   #     - ./iot-4/data:/data
+  #     - ./iot-4/control:/control
 
   # iot-5:
-  #   image:
+  #   build: .
+  #   container_name: iot-5
+  #   environment:
+  #     - MQTT_HOST=core1.emqx.io
+  #     - MQTT_PORT=1883
+  #     - MQTT_CLIENT_ID=iot-device-5
+  #   networks:
+  #     - kafka-net
+  #     - project-network
   #   volumes:
   #     - ./iot-5/data:/data
+  #     - ./iot-5/control:/control
 
   # iot-6:
-  #   image:
+  #   build: .
+  #   container_name: iot-6
+  #   environment:
+  #     - MQTT_HOST=core1.emqx.io
+  #     - MQTT_PORT=1883
+  #     - MQTT_CLIENT_ID=iot-device-6
+  #   networks:
+  #     - kafka-net
+  #     - project-network
   #   volumes:
   #     - ./iot-6/data:/data
+  #     - ./iot-6/control:/control
 
   # iot-7:
-  #   image:
+  #   build: .
+  #   container_name: iot-7
+  #   environment:
+  #     - MQTT_HOST=core1.emqx.io
+  #     - MQTT_PORT=1883
+  #     - MQTT_CLIENT_ID=iot-device-7
+  #   networks:
+  #     - kafka-net
+  #     - project-network
   #   volumes:
   #     - ./iot-7/data:/data
+  #     - ./iot-7/control:/control
 
   # iot-8:
-  #   image:
+  #   build: .
+  #   container_name: iot-8
+  #   environment:
+  #     - MQTT_HOST=core1.emqx.io
+  #     - MQTT_PORT=1883
+  #     - MQTT_CLIENT_ID=iot-device-8
+  #   networks:
+  #     - kafka-net
+  #     - project-network
   #   volumes:
   #     - ./iot-8/data:/data
+  #     - ./iot-8/control:/control
 
   # iot-9:
-  #   image:
+  #   build: .
+  #   container_name: iot-9
+  #   environment:
+  #     - MQTT_HOST=core1.emqx.io
+  #     - MQTT_PORT=1883
+  #     - MQTT_CLIENT_ID=iot-device-9
+  #   networks:
+  #     - kafka-net
+  #     - project-network
   #   volumes:
   #     - ./iot-9/data:/data
+  #     - ./iot-9/control:/control
 
-  # iot-1000000000:
-  #   image:
+  # iot-10:
+  #   build: .
+  #   container_name: iot-10
+  #   environment:
+  #     - MQTT_HOST=core1.emqx.io
+  #     - MQTT_PORT=1883
+  #     - MQTT_CLIENT_ID=iot-device-10
+  #   networks:
+  #     - kafka-net
+  #     - project-network
   #   volumes:
   #     - ./iot-10/data:/data
+  #     - ./iot-10/control:/control
+
+  # iot-11:
+  #   build: .
+  #   container_name: iot-11
+  #   environment:
+  #     - MQTT_HOST=core1.emqx.io
+  #     - MQTT_PORT=1883
+  #     - MQTT_CLIENT_ID=iot-device-11
+  #   networks:
+  #     - kafka-net
+  #     - project-network
+  #   volumes:
+  #     - ./iot-11/data:/data
+  #     - ./iot-11/control:/control
 
 networks:
   project-network:
