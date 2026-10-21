@@ -92,11 +92,9 @@ def on_connect_fail(client, userdata):
 
 
 def publish_batch(mqtt_client, record_dir, second, batch):
-    device_id = record_dir.name.split("_", 1)[0]
-    topic = f"sensors/{device_id}"
-
+    topic = f"sensors/{MQTT_CLIENT_ID}"
     payload = {
-        "device_id": MQTT_CLIENT_ID,
+        "patient_id": MQTT_CLIENT_ID,
         "record_id": record_dir.name,
         "timestamp": second,
         "eda": batch["EDA"],

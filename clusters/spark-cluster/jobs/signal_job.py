@@ -27,7 +27,7 @@ model_path = pyspark.SparkFiles.get('rf_final_model.joblib')
 model = joblib.load(model_path)
 
 def aggregateWindow(key, pdf_iter, state):
-    id = key[0]
+    patient_id = key[0]
 
     if state.exists:
         current_state = state.get
@@ -55,17 +55,19 @@ def aggregateWindow(key, pdf_iter, state):
                 start = mark
                 end = start + WINDOW_LENGTH - 1
 
-                msg = {
-                    'label': int(-1),
-                    'start': float(start),
-                    'end': float(end),
-                    'id': str(id),
-                }
-
                 w_eda, eda_rbound = extract_eda(eda_buf, ts_buf, start, end)
                 w_ibi, ibi_rbound = extract_ibi(ibi_buf, ts_buf, start, end)
                 eda_rbound = int(eda_rbound)
                 ibi_rbound = int(ibi_rbound)
+
+                msg = {
+                    'label': int(-1),
+                    'start': float(start),
+                    'end': float(end),
+                    'w_eda': w_eda,
+                    'w_ibi': w_ibi,
+                    'key': str(patient_id),
+                }
 
                 window = signal.Window(
                     start_time=mark,
@@ -90,7 +92,7 @@ def aggregateWindow(key, pdf_iter, state):
                 ibi_buf = ibi_buf[ibi_rbound:]
                 eda_buf = eda_buf[eda_rbound:]
                 ts_buf = ts_buf[eda_rbound:]
-                mark += WINDOW_LENGTH
+                mark += WINDOW_LENGTH * OVERLAP_RATIO
 
                 messages.append(msg)
 
@@ -98,8 +100,16 @@ def aggregateWindow(key, pdf_iter, state):
     if mark is not None:
         state.update((eda_buf, ibi_buf, ts_buf, mark))
 
-    out = pd.DataFrame(messages, columns=['label', 'start', 'end', 'id'])
-    out = out.astype({'label': 'int32', 'start': 'float64', 'end': 'float64', 'id': 'str'})
+    out = pd.DataFrame(messages, columns=['label', 'start', 'end', 'w_eda', 'w_ibi', 'key'])
+    out = out.astype({
+        'label': 'int32', 
+        'start': 'float64', 
+        'end': 'float64', 
+        'w_eda': 'object', 
+        'w_ibi': 'object', 
+        'key': 'str'
+    })
+
     yield out
 
 def send_prediction(partition):
@@ -124,7 +134,7 @@ def send_predictions(batch_df, batch_id):
     batch_df.rdd.foreachPartition(send_prediction)
 
 signal_schema = StructType([
-    StructField("device_id", StringType(), True),
+    StructField("patient_id", StringType(), True),
     StructField("eda", ArrayType(DoubleType()), True),
     StructField("ibi", ArrayType(DoubleType()), True),
     StructField("timestamp", DoubleType(), True),
@@ -141,7 +151,9 @@ output_schema = StructType([
     StructField("label", IntegerType(), True),
     StructField("start", DoubleType(), True),
     StructField("end", DoubleType(), True),
-    StructField("id", StringType(), True),
+    StructField("w_eda", ArrayType(DoubleType()), True),
+    StructField("w_ibi", ArrayType(DoubleType()), True),
+    StructField("key", StringType(), True),
 ])
 
 kafka_df = spark.readStream \
@@ -164,18 +176,28 @@ parsed_df = kafka_df.select(
 )
 
 predictions_stream = parsed_df \
-    .groupBy("device_id") \
+    .groupBy("patient_id") \
     .applyInPandasWithState(
         func=aggregateWindow,
         outputStructType=output_schema,
         stateStructType=state_schema,
         outputMode="append",
         timeoutConf=GroupStateTimeout.NoTimeout
+    ) \
+    .select(
+        F.col('key'),
+        F.to_json(F.struct(
+            "label", "start", "end", "w_eda", "w_ibi"
+        )).alias("value")
     )
 
 query = predictions_stream \
     .writeStream \
-    .foreachBatch(send_predictions) \
+    .format("kafka") \
+    .option("kafka.bootstrap.servers", "kafka-1:9092,kafka-2:9092") \
+    .option("topic", "prediction") \
+    .option("checkpointLocation", "/tmp/checkpoint") \
+    .outputMode("append") \
     .start()
 
 query.awaitTermination()

@@ -23,6 +23,7 @@ services:
       - project-network
     volumes:
       - ./broker-1/data:/var/lib/kafka/data
+      - ./broker-1/logs:/tmp/kafka-logs
 
   kafka-2:
     image: apache/kafka:latest
@@ -48,6 +49,7 @@ services:
       - project-network
     volumes:
       - ./broker-2/data:/var/lib/kafka/data
+      - ./broker-2/logs:/tmp/kafka-logs
 
   kafka-3:
     image: apache/kafka:latest
@@ -73,6 +75,7 @@ services:
       - project-network
     volumes:
       - ./broker-3/data:/var/lib/kafka/data
+      - ./broker-3/logs:/tmp/kafka-logs
 
   kafka-ui:
     image: provectuslabs/kafka-ui

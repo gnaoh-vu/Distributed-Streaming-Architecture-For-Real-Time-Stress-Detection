@@ -37,6 +37,7 @@ services:
       "
     networks:
       - project-network
+
   resource-manager:
     image: apache/hadoop:3.5.0 
     ports:
