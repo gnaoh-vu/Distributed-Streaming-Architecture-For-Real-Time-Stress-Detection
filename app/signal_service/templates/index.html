@@ -9,9 +9,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
-        rel="stylesheet">
+        rel="stylesheet"
+    >
 
-    <link href="./styles/style.css">
+    <link href="/static/styles/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -26,15 +27,12 @@
     <div class="dashboard-grid">
         <!-- Patient Selector List -->
         <div class="patient-list">
-            <h3>Danh sách Bệnh nhân</h3>
-            <div class="patient-card active" id="card-p1">
-                <strong>Part 101C</strong>
-                <p>Status: Normal</p>
-            </div>
-            <div class="patient-card stress" id="card-p2">
-                <strong>Part 102C</strong>
-                <p>Status: STRESS DETECTED</p>
-            </div>
+            <h3>Patients</h3>
+            <label for="patient-selector">Select patient</label>
+            <select id="patient-selector" disabled>
+                <option value="">Waiting for patients...</option>
+            </select>
+            <div id="patient-list-items" aria-live="polite"></div>
         </div>
 
         <!-- Main Realtime Tracking Panel -->
@@ -45,34 +43,18 @@
                     <div class="metric-value" id="val-eda" style="color: var(--accent-blue);">0.00 µS</div>
                 </div>
                 <div class="metric-card">
-                    <span class="metric-label">Heart Rate</span>
-                    <div class="metric-value" id="val-hr" style="color: var(--accent-green);">0 BPM</div>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Blood Volume Pulse</span>
-                    <div class="metric-value" id="val-bvp" style="color: var(--accent-amber);">0.00</div>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Accelerometer</span>
-                    <div class="metric-value" id="val-accelerometer" style="color: var(--accent-violet);">0.00 g</div>
-                </div>
-                <div class="metric-card">
-                    <span class="metric-label">Temperature</span>
-                    <div class="metric-value" id="val-temperature" style="color: var(--accent-orange);">0.0 °C</div>
-                </div>
-                <div class="metric-card">
                     <span class="metric-label">Inter-beat Interval</span>
-                    <div class="metric-value" id="val-ibi" style="color: var(--accent-rose);">0 ms</div>
+                    <div class="metric-value" id="val-ibi" style="color: var(--accent-rose);">--</div>
                 </div>
                 <div class="metric-card">
                     <span class="metric-label">AI Prediction (Current Window)</span>
-                    <div class="metric-value" id="val-stress" style="color: var(--accent-green);">NORMAL</div>
+                    <div class="metric-value" id="val-stress" style="color: var(--text-sub);">Waiting for prediction</div>
                 </div>
             </div>
 
             <div class="chart-card">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3>Real-time Signal Track (EDA & Stress Window)</h3>
+                    <h3>EDA Signal & Prediction Windows</h3>
                     <span id="time-display">Live: 0s</span>
                 </div>
 
@@ -87,7 +69,7 @@
                         <input type="range" id="timeSlider" min="0" max="0" value="0" disabled>
                         <div
                             style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-sub);">
-                            <span>T-Minus Max</span>
+                            <span>5 min ago</span>
                             <span id="slider-time-label">0s</span>
                             <span>NOW</span>
                         </div>
@@ -98,8 +80,8 @@
     </div>
 
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-    <script src="app.js"></script>
-    <script src="websocket.js"></script>
+    <script src="/static/sources/app.js"></script>
+    <script src="/static/sources/websocket.js"></script>
 </body>
 
 </html>

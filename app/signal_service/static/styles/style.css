@@ -101,12 +101,35 @@ header h2 {
     text-transform: none;
 }
 
+.patient-list label {
+    color: var(--text-sub);
+    font-size: 0.78rem;
+}
+
+#patient-selector {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-main);
+    font: inherit;
+}
+
+#patient-list-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
 .patient-card {
+    width: 100%;
     background: var(--card-bg);
     padding: 12px 14px;
     border: 1px solid var(--border-color);
     border-left: 2px solid var(--border-color);
     cursor: pointer;
+    text-align: left;
+    font: inherit;
 }
 
 .patient-card strong {
@@ -119,6 +142,18 @@ header h2 {
     margin-top: 3px;
     font-size: 0.78rem;
     color: var(--text-sub);
+}
+
+.patient-card.pending p {
+    color: var(--text-sub);
+}
+
+.patient-card.normal {
+    border-left-color: var(--accent-green);
+}
+
+.patient-card.normal p {
+    color: var(--accent-green);
 }
 
 .patient-card.active {
@@ -235,6 +270,10 @@ header h2 {
 input[type="range"] {
     width: 100%;
     accent-color: var(--text-main);
+}
+
+input[type="range"]:disabled {
+    opacity: 0.5;
 }
 
 #slider-time-label {
