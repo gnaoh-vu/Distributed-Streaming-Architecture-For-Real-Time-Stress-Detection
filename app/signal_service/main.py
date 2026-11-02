@@ -23,7 +23,7 @@ def run_kafka_consumer():
     config = {
         'bootstrap.servers': 'kafka-1:9092,kafka-2:9092',
         'auto.offset.reset': 'earliest',
-        'group.id': 'consumer'
+        'group.id': 'consumer-10'
     }
 
     consumer = Consumer(config)
@@ -40,10 +40,8 @@ def run_kafka_consumer():
                 else: raise KafkaException(msg.error())
 
             topic = msg.topic()
-            patient_id = msg.key().decode('utf-8')
             value = json.loads(msg.value().decode('utf-8'))
-
-            print(value, patient_id, topic, flush=True)
+            patient_id = value.get('patient_id') if topic == 'signal' else msg.key().decode('utf-8')
 
             if patient_id not in patient_to_sensors:
                 patient_to_sensors[patient_id] = {'sensors': [], 'predictions': []}
