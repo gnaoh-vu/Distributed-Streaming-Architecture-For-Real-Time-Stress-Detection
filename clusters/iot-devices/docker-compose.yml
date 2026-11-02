@@ -83,19 +83,19 @@ services:
   #     - ./iot-6/data:/data
   #     - ./iot-6/control:/control
 
-  # iot-7:
-  #   build: .
-  #   container_name: iot-7
-  #   environment:
-  #     - MQTT_HOST=core1.emqx.io
-  #     - MQTT_PORT=1883
-  #     - MQTT_CLIENT_ID=iot-device-7
-  #   networks:
-  #     - kafka-net
-  #     - project-network
-  #   volumes:
-  #     - ./iot-7/data:/data
-  #     - ./iot-7/control:/control
+  iot-7:
+    build: .
+    container_name: iot-7
+    environment:
+      - MQTT_HOST=core1.emqx.io
+      - MQTT_PORT=1883
+      - MQTT_CLIENT_ID=6
+    networks:
+      - project-network
+    volumes:
+      - ./main.py:/app/main.py
+      - ./iot-7/data/Part 108C:/data
+      - ./iot-7/control:/control
 
   # iot-8:
   #   build: .

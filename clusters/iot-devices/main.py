@@ -21,7 +21,7 @@ NEXT_FILE = CONTROL_DIR / "next"
 
 print(os.listdir('/data'))
 
-SIMULATION_SPEED = 1.0
+SIMULATION_SPEED = 1
 METRICS = ("EDA", "IBI")
 
 logging.basicConfig(
@@ -77,9 +77,7 @@ def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=No
         )
 
 def on_publish(client, userdata, mid, reason_code, properties=None):
-    if reason_code == 0 or reason_code.value == 0:
-        logger.info("Publish acknowledged, batch number: mid=%s", mid)
-    else:
+    if reason_code != 0 and reason_code.value != 0:
         logger.error(
             "Publish failed: mid=%s, reason=%s (code=%s)",
             mid,
@@ -90,18 +88,16 @@ def on_publish(client, userdata, mid, reason_code, properties=None):
 def on_connect_fail(client, userdata):
     logger.error("MQTT socket/network layer connection failed (broker unreachable)")
 
-
 def publish_batch(mqtt_client, record_dir, second, batch):
     topic = f"sensors/{MQTT_CLIENT_ID}"
     payload = {
         "patient_id": MQTT_CLIENT_ID,
         "record_id": record_dir.name,
         "timestamp": second,
+        "src_ts": int(time.time()),
         "eda": batch["EDA"],
         "ibi": batch["IBI"],
     }
-
-    logger.info(json.dumps(payload))
 
     mqtt_client.publish(
         topic,
@@ -148,8 +144,8 @@ def read_eda(path: Path) -> Iterator[tuple[float,str,float]]:
         )
 
         for index, value in enumerate(values):
-            relative_time = index / frequency
-            yield relative_time, "EDA", value
+            relative_time = index // frequency
+            yield start_timestamp_dataset + relative_time, "EDA", value
 
 def read_ibi(path: Path) -> Iterator[tuple[float,str,float]]:
     with path.open("r",newline="",encoding='utf-8') as file:
@@ -158,9 +154,9 @@ def read_ibi(path: Path) -> Iterator[tuple[float,str,float]]:
         try:
             header = next(reader)
         except StopIteration:
-            raise ValueError(f"IBI file is empty: {path}")
+            return None
 
-        start_timestamp_data = float(header[0].strip())
+        start_timestamp_dataset = float(header[0].strip())
         relative_timestamp = time.time()
 
         logger.info(
@@ -190,7 +186,7 @@ def read_ibi(path: Path) -> Iterator[tuple[float,str,float]]:
                 )
                 continue
 
-            yield relative_time, "IBI", relative_time
+            yield start_timestamp_dataset + relative_time, "IBI", relative_time
 
 def stream_data(streams: list[Iterator[tuple[float,str,float]]],) -> Iterator[tuple[float,str,float]]:
         iterators = [iter(stream) for stream in streams]
@@ -231,7 +227,8 @@ def build_stream(record_dir: Path) -> list[Iterator[tuple[float,str,float]]]:
         if sensor == "EDA":
             streams.append(read_eda(sensor_file))
         elif sensor == "IBI":
-            streams.append(read_ibi(sensor_file))
+            ibi_iter = read_ibi(sensor_file)
+            if ibi_iter is not None: streams.append(ibi_iter)
 
     if not streams:
         raise RuntimeError(f"No sensor files in {record_dir}")
@@ -279,12 +276,12 @@ def run_simulation(record_dir: Path, mqtt_client):
                 batch=batch,
             )
 
-            logger.info(
-                "Record Device=%s | t=%d | Batch Value=%s",
-                record_dir.name,
-                cur_second,
-                json.dumps(batch,indent=2)        
-            )
+            # logger.info(
+            #     "Record Device=%s | t=%d | Batch Value=%s",
+            #     record_dir.name,
+            #     cur_second,
+            #     json.dumps(batch,indent=2)        
+            # )
             event_count += 1
 
             cur_second = second
@@ -292,13 +289,13 @@ def run_simulation(record_dir: Path, mqtt_client):
 
         batch[sensor].append(values)
 
-    if cur_second is not None:
-        logger.info(
-            "Record Device=%s | t=%d | Batch Values:\n%s",
-            record_dir.name,
-            cur_second,
-            json.dumps(batch, indent=2),
-        )
+    # if cur_second is not None:
+        # logger.info(
+        #     "Record Device=%s | t=%d | Batch Values:\n%s",
+        #     record_dir.name,
+        #     cur_second,
+        #     json.dumps(batch, indent=2),
+        # )
 
     publish_batch(
         mqtt_client=mqtt_client,
@@ -332,7 +329,6 @@ def main() -> None:
     mqtt_client = create_mqtt_client()
     try:
         for index, record_dir in enumerate(records):
-
             logger.info(
                 "Starting record %d/%d: %s",
                 index + 1,
@@ -344,8 +340,8 @@ def main() -> None:
 
             logger.info("Completed record: %s", record_dir.name)
 
-            if index < len(records) - 1:
-                wait_next()
+            # if index < len(records) - 1:
+            #     wait_next()
     finally:
         mqtt_client.disconnect()
         mqtt_client.loop_stop()

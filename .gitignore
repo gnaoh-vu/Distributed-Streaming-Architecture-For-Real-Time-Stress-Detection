@@ -11,9 +11,11 @@ clusters/kafka-cluster/*/logs/*
 clusters/spark-cluster/datanode/data/*
 clusters/spark-cluster/namenode/data/*
 clusters/spark-cluster/namenode/data/*
+clusters/stress-test
 
 iot-*/
 target
+app/trend_service
 
 ADARP/
 WESAD/
