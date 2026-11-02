@@ -34,10 +34,11 @@ def aggregateWindow(key, pdf_iter, state):
         eda_buf = list(current_state[0])
         ibi_buf = list(current_state[1])
         ts_buf = list(current_state[2])
-        mark = float(current_state[3])
+        src_ts_buf = list(current_state[3])
+        mark = float(current_state[4])
 
     else:
-        eda_buf, ibi_buf, ts_buf = [], [], []
+        eda_buf, ibi_buf, ts_buf, src_ts_buf = [], [], [], []
         mark = None
 
     messages = []
@@ -46,6 +47,7 @@ def aggregateWindow(key, pdf_iter, state):
         for _, row in pdf.iterrows():
             eda_buf.append([float(x) for x in row['eda']])
             ibi_buf.append([float(x) for x in row['ibi']])
+            src_ts_buf.append(float(row['src_ts']))
             ts_buf.append(float(row['timestamp']))
 
             if mark is None: 
@@ -66,7 +68,9 @@ def aggregateWindow(key, pdf_iter, state):
                     'end': float(end),
                     'w_eda': w_eda,
                     'w_ibi': w_ibi,
-                    'key': str(patient_id),
+                    'key': str(row['patient_id']),
+                    'src_ts': int(src_ts_buf[-1]),
+                    'spark_ts': int(time.time())
                 }
 
                 window = signal.Window(
@@ -82,7 +86,6 @@ def aggregateWindow(key, pdf_iter, state):
                     w_ibi
                 )
 
-
                 if result is not None:
                     hrv_features, eda_features = result
                     X = np.concatenate((np.array(hrv_features), np.array(eda_features))).reshape(1, -1)
@@ -92,58 +95,42 @@ def aggregateWindow(key, pdf_iter, state):
                 ibi_buf = ibi_buf[ibi_rbound:]
                 eda_buf = eda_buf[eda_rbound:]
                 ts_buf = ts_buf[eda_rbound:]
+                src_ts_buf = src_ts_buf[eda_rbound:]
                 mark += WINDOW_LENGTH * OVERLAP_RATIO
 
                 messages.append(msg)
 
 
     if mark is not None:
-        state.update((eda_buf, ibi_buf, ts_buf, mark))
+        state.update((eda_buf, ibi_buf, ts_buf, src_ts_buf, mark))
 
-    out = pd.DataFrame(messages, columns=['label', 'start', 'end', 'w_eda', 'w_ibi', 'key'])
+    out = pd.DataFrame(messages, columns=['label', 'start', 'end', 'w_eda', 'w_ibi', 'key', 'src_ts', 'spark_ts'])
     out = out.astype({
         'label': 'int32', 
         'start': 'float64', 
         'end': 'float64', 
         'w_eda': 'object', 
         'w_ibi': 'object', 
-        'key': 'str'
+        'key': 'str',
+        'src_ts': 'float64', 
+        'spark_ts': 'float64' 
     })
 
     yield out
-
-def send_prediction(partition):
-    session = requests.Session()
-
-    try:
-        for label, start, end, id  in partition:
-            body = {'label': label, 'start': start, 'end': end, 'id': id}
-            session.post(
-                'http://signal-service:8000/window',
-                json=body
-            )
-
-    except Exception as e:
-        print(str(e), flush=True)
-
-    finally:
-        session.close()
-
-def send_predictions(batch_df, batch_id):
-    if batch_df.isEmpty(): return
-    batch_df.rdd.foreachPartition(send_prediction)
 
 signal_schema = StructType([
     StructField("patient_id", StringType(), True),
     StructField("eda", ArrayType(DoubleType()), True),
     StructField("ibi", ArrayType(DoubleType()), True),
     StructField("timestamp", DoubleType(), True),
+    StructField("src_ts", DoubleType(), True),
 ])
 
 state_schema = StructType([
     StructField("eda", ArrayType(ArrayType(DoubleType())), True),
     StructField("ibi", ArrayType(ArrayType(DoubleType())), True),
     StructField("timestamp", ArrayType(DoubleType()), True),
+    StructField("src_ts", ArrayType(DoubleType()), True),
     StructField("mark", DoubleType(), True),
 ])
 
@@ -154,6 +141,8 @@ output_schema = StructType([
     StructField("w_eda", ArrayType(DoubleType()), True),
     StructField("w_ibi", ArrayType(DoubleType()), True),
     StructField("key", StringType(), True),
+    StructField("src_ts", DoubleType(), True),
+    StructField("spark_ts", DoubleType(), True),
 ])
 
 kafka_df = spark.readStream \
@@ -186,8 +175,11 @@ predictions_stream = parsed_df \
     ) \
     .select(
         F.col('key'),
+        # Include benchmark timestamps so latency.py can match predictions
+        # to their source signal and compute the Spark-to-Kafka interval.
         F.to_json(F.struct(
-            "label", "start", "end", "w_eda", "w_ibi"
+            "label", "start", "end", "w_eda", "w_ibi",
+            "src_ts", "spark_ts", "key"
         )).alias("value")
     )
 
@@ -196,7 +188,7 @@ query = predictions_stream \
     .format("kafka") \
     .option("kafka.bootstrap.servers", "kafka-1:9092,kafka-2:9092") \
     .option("topic", "prediction") \
-    .option("checkpointLocation", "/tmp/checkpoint") \
+    .option("checkpointLocation", "/tmp/checkpoint-signal") \
     .outputMode("append") \
     .start()
 

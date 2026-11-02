@@ -1,0 +1,738 @@
+2026-10-28 05:44:09,075 - INFO - Python Spark Scheduler started.
+2026-10-28 05:45:00,082 - INFO - Starting Spark job submission...
+2026-10-28 05:45:21,118 - ERROR - Spark job failed with return code 1
+2026-10-28 05:45:21,118 - ERROR - Error output: Ivy Default Cache set to: /root/.ivy2/cache
+The jars for the packages stored in: /root/.ivy2/jars
+org.apache.spark#spark-sql-kafka-0-10_2.12 added as a dependency
+:: resolving dependencies :: org.apache.spark#spark-submit-parent-022e3a30-5840-4190-a5c4-58e2a2004c5d;1.0
+	confs: [default]
+	found org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.0 in central
+	found org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.0 in central
+	found org.apache.kafka#kafka-clients;3.4.1 in central
+	found org.lz4#lz4-java;1.8.0 in central
+	found org.xerial.snappy#snappy-java;1.1.10.3 in central
+	found org.slf4j#slf4j-api;2.0.7 in central
+	found org.apache.hadoop#hadoop-client-runtime;3.3.4 in central
+	found org.apache.hadoop#hadoop-client-api;3.3.4 in central
+	found commons-logging#commons-logging;1.1.3 in central
+	found com.google.code.findbugs#jsr305;3.0.0 in central
+	found org.apache.commons#commons-pool2;2.11.1 in central
+downloading https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.12/3.5.0/spark-sql-kafka-0-10_2.12-3.5.0.jar ...
+	[SUCCESSFUL ] org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.0!spark-sql-kafka-0-10_2.12.jar (311ms)
+downloading https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0-10_2.12/3.5.0/spark-token-provider-kafka-0-10_2.12-3.5.0.jar ...
+	[SUCCESSFUL ] org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.0!spark-token-provider-kafka-0-10_2.12.jar (142ms)
+downloading https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.4.1/kafka-clients-3.4.1.jar ...
+	[SUCCESSFUL ] org.apache.kafka#kafka-clients;3.4.1!kafka-clients.jar (321ms)
+downloading https://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/3.0.0/jsr305-3.0.0.jar ...
+	[SUCCESSFUL ] com.google.code.findbugs#jsr305;3.0.0!jsr305.jar (127ms)
+downloading https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.11.1/commons-pool2-2.11.1.jar ...
+	[SUCCESSFUL ] org.apache.commons#commons-pool2;2.11.1!commons-pool2.jar (161ms)
+downloading https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-client-runtime/3.3.4/hadoop-client-runtime-3.3.4.jar ...
+	[SUCCESSFUL ] org.apache.hadoop#hadoop-client-runtime;3.3.4!hadoop-client-runtime.jar (1189ms)
+downloading https://repo1.maven.org/maven2/org/lz4/lz4-java/1.8.0/lz4-java-1.8.0.jar ...
+	[SUCCESSFUL ] org.lz4#lz4-java;1.8.0!lz4-java.jar (144ms)
+downloading https://repo1.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.10.3/snappy-java-1.1.10.3.jar ...
+	[SUCCESSFUL ] org.xerial.snappy#snappy-java;1.1.10.3!snappy-java.jar(bundle) (186ms)
+downloading https://repo1.maven.org/maven2/org/slf4j/slf4j-api/2.0.7/slf4j-api-2.0.7.jar ...
+	[SUCCESSFUL ] org.slf4j#slf4j-api;2.0.7!slf4j-api.jar (119ms)
+downloading https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-client-api/3.3.4/hadoop-client-api-3.3.4.jar ...
+	[SUCCESSFUL ] org.apache.hadoop#hadoop-client-api;3.3.4!hadoop-client-api.jar (702ms)
+downloading https://repo1.maven.org/maven2/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3.jar ...
+	[SUCCESSFUL ] commons-logging#commons-logging;1.1.3!commons-logging.jar (123ms)
+:: resolution report :: resolve 14969ms :: artifacts dl 3539ms
+	:: modules in use:
+	com.google.code.findbugs#jsr305;3.0.0 from central in [default]
+	commons-logging#commons-logging;1.1.3 from central in [default]
+	org.apache.commons#commons-pool2;2.11.1 from central in [default]
+	org.apache.hadoop#hadoop-client-api;3.3.4 from central in [default]
+	org.apache.hadoop#hadoop-client-runtime;3.3.4 from central in [default]
+	org.apache.kafka#kafka-clients;3.4.1 from central in [default]
+	org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.0 from central in [default]
+	org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.0 from central in [default]
+	org.lz4#lz4-java;1.8.0 from central in [default]
+	org.slf4j#slf4j-api;2.0.7 from central in [default]
+	org.xerial.snappy#snappy-java;1.1.10.3 from central in [default]
+	---------------------------------------------------------------------
+	|                  |            modules            ||   artifacts   |
+	|       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+	---------------------------------------------------------------------
+	|      default     |   11  |   11  |   11  |   0   ||   11  |   11  |
+	---------------------------------------------------------------------
+:: retrieving :: org.apache.spark#spark-submit-parent-022e3a30-5840-4190-a5c4-58e2a2004c5d
+	confs: [default]
+	11 artifacts copied, 0 already retrieved (56767kB/46ms)
+26/10/28 05:45:20 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Exception in thread "main" org.apache.spark.SparkException: Failed to get main class in JAR with error 'File file:/jobs/2 does not exist'.  Please specify one with --class.
+	at org.apache.spark.deploy.SparkSubmit.error(SparkSubmit.scala:1038)
+	at org.apache.spark.deploy.SparkSubmit.prepareSubmitEnvironment(SparkSubmit.scala:524)
+	at org.apache.spark.deploy.SparkSubmit.org$apache$spark$deploy$SparkSubmit$$runMain(SparkSubmit.scala:955)
+	at org.apache.spark.deploy.SparkSubmit.doRunMain$1(SparkSubmit.scala:192)
+	at org.apache.spark.deploy.SparkSubmit.submit(SparkSubmit.scala:215)
+	at org.apache.spark.deploy.SparkSubmit.doSubmit(SparkSubmit.scala:91)
+	at org.apache.spark.deploy.SparkSubmit$$anon$2.doSubmit(SparkSubmit.scala:1111)
+	at org.apache.spark.deploy.SparkSubmit$.main(SparkSubmit.scala:1120)
+	at org.apache.spark.deploy.SparkSubmit.main(SparkSubmit.scala)
+
+2026-10-28 05:51:52,798 - INFO - Starting Spark job submission...
+2026-10-28 05:52:07,129 - ERROR - Spark job failed with return code 1
+2026-10-28 05:52:07,129 - ERROR - Error output: Ivy Default Cache set to: /root/.ivy2/cache
+The jars for the packages stored in: /root/.ivy2/jars
+org.apache.spark#spark-sql-kafka-0-10_2.12 added as a dependency
+:: resolving dependencies :: org.apache.spark#spark-submit-parent-206632b7-00f5-43ed-abfa-5c9dc708b36f;1.0
+	confs: [default]
+	found org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.0 in central
+	found org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.0 in central
+	found org.apache.kafka#kafka-clients;3.4.1 in central
+	found org.lz4#lz4-java;1.8.0 in central
+	found org.xerial.snappy#snappy-java;1.1.10.3 in central
+	found org.slf4j#slf4j-api;2.0.7 in central
+	found org.apache.hadoop#hadoop-client-runtime;3.3.4 in central
+	found org.apache.hadoop#hadoop-client-api;3.3.4 in central
+	found commons-logging#commons-logging;1.1.3 in central
+	found com.google.code.findbugs#jsr305;3.0.0 in central
+	found org.apache.commons#commons-pool2;2.11.1 in central
+:: resolution report :: resolve 490ms :: artifacts dl 13ms
+	:: modules in use:
+	com.google.code.findbugs#jsr305;3.0.0 from central in [default]
+	commons-logging#commons-logging;1.1.3 from central in [default]
+	org.apache.commons#commons-pool2;2.11.1 from central in [default]
+	org.apache.hadoop#hadoop-client-api;3.3.4 from central in [default]
+	org.apache.hadoop#hadoop-client-runtime;3.3.4 from central in [default]
+	org.apache.kafka#kafka-clients;3.4.1 from central in [default]
+	org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.0 from central in [default]
+	org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.0 from central in [default]
+	org.lz4#lz4-java;1.8.0 from central in [default]
+	org.slf4j#slf4j-api;2.0.7 from central in [default]
+	org.xerial.snappy#snappy-java;1.1.10.3 from central in [default]
+	---------------------------------------------------------------------
+	|                  |            modules            ||   artifacts   |
+	|       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+	---------------------------------------------------------------------
+	|      default     |   11  |   0   |   0   |   0   ||   11  |   0   |
+	---------------------------------------------------------------------
+:: retrieving :: org.apache.spark#spark-submit-parent-206632b7-00f5-43ed-abfa-5c9dc708b36f
+	confs: [default]
+	0 artifacts copied, 11 already retrieved (0kB/9ms)
+26/10/28 05:51:55 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+26/10/28 05:51:55 INFO DefaultNoHARMFailoverProxyProvider: Connecting to ResourceManager at resource-manager/172.19.0.9:8032
+26/10/28 05:51:55 INFO Configuration: resource-types.xml not found
+26/10/28 05:51:55 INFO ResourceUtils: Unable to find 'resource-types.xml'.
+26/10/28 05:51:55 INFO Client: Verifying our application has not requested more than the maximum memory capability of the cluster (4096 MB per container)
+26/10/28 05:51:55 INFO Client: Will allocate AM container, with 1408 MB memory including 384 MB overhead
+26/10/28 05:51:55 INFO Client: Setting up container launch context for our AM
+26/10/28 05:51:55 INFO Client: Setting up the launch environment for our AM container
+26/10/28 05:51:55 INFO Client: Preparing resources for our AM container
+26/10/28 05:51:55 WARN Client: Neither spark.yarn.jars nor spark.yarn.archive is set, falling back to uploading libraries under SPARK_HOME.
+26/10/28 05:51:57 INFO Client: Uploading resource file:/tmp/spark-36ce3bc5-8ea0-4f63-93ac-27ea0717ed7c/__spark_libs__12213962759213951013.zip -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/__spark_libs__12213962759213951013.zip
+26/10/28 05:51:58 INFO Client: Uploading resource file:/root/.ivy2/jars/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.0.jar -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.0.jar
+26/10/28 05:51:58 INFO Client: Uploading resource file:/root/.ivy2/jars/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.0.jar -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.0.jar
+26/10/28 05:51:58 INFO Client: Uploading resource file:/root/.ivy2/jars/org.apache.kafka_kafka-clients-3.4.1.jar -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/org.apache.kafka_kafka-clients-3.4.1.jar
+26/10/28 05:51:58 INFO Client: Uploading resource file:/root/.ivy2/jars/com.google.code.findbugs_jsr305-3.0.0.jar -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/com.google.code.findbugs_jsr305-3.0.0.jar
+26/10/28 05:51:58 INFO Client: Uploading resource file:/root/.ivy2/jars/org.apache.commons_commons-pool2-2.11.1.jar -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/org.apache.commons_commons-pool2-2.11.1.jar
+26/10/28 05:51:58 INFO Client: Uploading resource file:/root/.ivy2/jars/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar
+26/10/28 05:51:58 INFO Client: Uploading resource file:/root/.ivy2/jars/org.lz4_lz4-java-1.8.0.jar -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/org.lz4_lz4-java-1.8.0.jar
+26/10/28 05:51:58 INFO Client: Uploading resource file:/root/.ivy2/jars/org.xerial.snappy_snappy-java-1.1.10.3.jar -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/org.xerial.snappy_snappy-java-1.1.10.3.jar
+26/10/28 05:51:58 INFO Client: Uploading resource file:/root/.ivy2/jars/org.slf4j_slf4j-api-2.0.7.jar -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/org.slf4j_slf4j-api-2.0.7.jar
+26/10/28 05:51:58 INFO Client: Uploading resource file:/root/.ivy2/jars/org.apache.hadoop_hadoop-client-api-3.3.4.jar -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/org.apache.hadoop_hadoop-client-api-3.3.4.jar
+26/10/28 05:51:58 INFO Client: Uploading resource file:/root/.ivy2/jars/commons-logging_commons-logging-1.1.3.jar -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/commons-logging_commons-logging-1.1.3.jar
+26/10/28 05:51:58 INFO Client: Uploading resource file:/jobs/kafka_hdfs.py -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/kafka_hdfs.py
+26/10/28 05:51:58 INFO Client: Uploading resource file:/opt/spark/python/lib/pyspark.zip -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/pyspark.zip
+26/10/28 05:51:58 INFO Client: Uploading resource file:/opt/spark/python/lib/py4j-0.10.9.7-src.zip -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/py4j-0.10.9.7-src.zip
+26/10/28 05:51:58 WARN Client: Same path resource file:///root/.ivy2/jars/org.apache.spark_spark-sql-kafka-0-10_2.12-3.5.0.jar added multiple times to distributed cache.
+26/10/28 05:51:58 WARN Client: Same path resource file:///root/.ivy2/jars/org.apache.spark_spark-token-provider-kafka-0-10_2.12-3.5.0.jar added multiple times to distributed cache.
+26/10/28 05:51:58 WARN Client: Same path resource file:///root/.ivy2/jars/org.apache.kafka_kafka-clients-3.4.1.jar added multiple times to distributed cache.
+26/10/28 05:51:58 WARN Client: Same path resource file:///root/.ivy2/jars/com.google.code.findbugs_jsr305-3.0.0.jar added multiple times to distributed cache.
+26/10/28 05:51:58 WARN Client: Same path resource file:///root/.ivy2/jars/org.apache.commons_commons-pool2-2.11.1.jar added multiple times to distributed cache.
+26/10/28 05:51:58 WARN Client: Same path resource file:///root/.ivy2/jars/org.apache.hadoop_hadoop-client-runtime-3.3.4.jar added multiple times to distributed cache.
+26/10/28 05:51:58 WARN Client: Same path resource file:///root/.ivy2/jars/org.lz4_lz4-java-1.8.0.jar added multiple times to distributed cache.
+26/10/28 05:51:58 WARN Client: Same path resource file:///root/.ivy2/jars/org.xerial.snappy_snappy-java-1.1.10.3.jar added multiple times to distributed cache.
+26/10/28 05:51:58 WARN Client: Same path resource file:///root/.ivy2/jars/org.slf4j_slf4j-api-2.0.7.jar added multiple times to distributed cache.
+26/10/28 05:51:58 WARN Client: Same path resource file:///root/.ivy2/jars/org.apache.hadoop_hadoop-client-api-3.3.4.jar added multiple times to distributed cache.
+26/10/28 05:51:58 WARN Client: Same path resource file:///root/.ivy2/jars/commons-logging_commons-logging-1.1.3.jar added multiple times to distributed cache.
+26/10/28 05:51:58 INFO Client: Uploading resource file:/tmp/spark-36ce3bc5-8ea0-4f63-93ac-27ea0717ed7c/__spark_conf__12354945998680952616.zip -> hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002/__spark_conf__.zip
+26/10/28 05:51:58 INFO SecurityManager: Changing view acls to: root
+26/10/28 05:51:58 INFO SecurityManager: Changing modify acls to: root
+26/10/28 05:51:58 INFO SecurityManager: Changing view acls groups to: 
+26/10/28 05:51:58 INFO SecurityManager: Changing modify acls groups to: 
+26/10/28 05:51:58 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: root; groups with view permissions: EMPTY; users with modify permissions: root; groups with modify permissions: EMPTY
+26/10/28 05:51:58 INFO Client: Submitting application application_1793159508153_0002 to ResourceManager
+26/10/28 05:51:59 INFO YarnClientImpl: Submitted application application_1793159508153_0002
+26/10/28 05:52:00 INFO Client: Application report for application_1793159508153_0002 (state: ACCEPTED)
+26/10/28 05:52:00 INFO Client: 
+	 client token: N/A
+	 diagnostics: AM container is launched, waiting for AM container to Register with RM
+	 ApplicationMaster host: N/A
+	 ApplicationMaster RPC port: -1
+	 queue: root.default
+	 start time: 1793166718994
+	 final status: UNDEFINED
+	 tracking URL: http://resource-manager:8088/proxy/application_1793159508153_0002/
+	 user: root
+26/10/28 05:52:01 INFO Client: Application report for application_1793159508153_0002 (state: ACCEPTED)
+26/10/28 05:52:02 INFO Client: Application report for application_1793159508153_0002 (state: ACCEPTED)
+26/10/28 05:52:03 INFO Client: Application report for application_1793159508153_0002 (state: ACCEPTED)
+26/10/28 05:52:04 INFO Client: Application report for application_1793159508153_0002 (state: ACCEPTED)
+26/10/28 05:52:05 INFO Client: Application report for application_1793159508153_0002 (state: ACCEPTED)
+26/10/28 05:52:06 INFO Client: Application report for application_1793159508153_0002 (state: ACCEPTED)
+26/10/28 05:52:07 INFO Client: Application report for application_1793159508153_0002 (state: FAILED)
+26/10/28 05:52:07 INFO Client: 
+	 client token: N/A
+	 diagnostics: Application application_1793159508153_0002 failed 2 times due to AM Container for appattempt_1793159508153_0002_000002 exited with  exitCode: 13
+Failing this attempt.Diagnostics: [2026-10-28 05:52:06.550]Exception from container-launch.
+Container id: container_1793159508153_0002_02_000001
+Exit code: 13
+
+[2026-10-28 05:52:06.554]Container exited with a non-zero exit code 13. Error file: prelaunch.err.
+Last 4096 bytes of prelaunch.err :
+Last 4096 bytes of stderr :
+ava:569)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$2.run(ApplicationMaster.scala:757)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	... 8 more
+26/10/28 05:52:06 INFO ApplicationMaster: Final app status: FAILED, exitCode: 13, (reason: User class threw exception: java.io.IOException: Cannot run program "./environment/bin/python": error=2, No such file or directory
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1143)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1073)
+	at org.apache.spark.deploy.PythonRunner$.main(PythonRunner.scala:98)
+	at org.apache.spark.deploy.PythonRunner.main(PythonRunner.scala)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$2.run(ApplicationMaster.scala:757)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	... 8 more
+)
+26/10/28 05:52:06 ERROR ApplicationMaster: Uncaught exception: 
+org.apache.spark.SparkException: Exception thrown in awaitResult: 
+	at org.apache.spark.util.ThreadUtils$.awaitResult(ThreadUtils.scala:322)
+	at org.apache.spark.deploy.yarn.ApplicationMaster.runDriver(ApplicationMaster.scala:525)
+	at org.apache.spark.deploy.yarn.ApplicationMaster.run(ApplicationMaster.scala:284)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$3.run(ApplicationMaster.scala:954)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$3.run(ApplicationMaster.scala:953)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:712)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:439)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1878)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$.main(ApplicationMaster.scala:953)
+	at org.apache.spark.deploy.yarn.ApplicationMaster.main(ApplicationMaster.scala)
+Caused by: java.io.IOException: Cannot run program "./environment/bin/python": error=2, No such file or directory
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1143)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1073)
+	at org.apache.spark.deploy.PythonRunner$.main(PythonRunner.scala:98)
+	at org.apache.spark.deploy.PythonRunner.main(PythonRunner.scala)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$2.run(ApplicationMaster.scala:757)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	... 8 more
+26/10/28 05:52:06 INFO ApplicationMaster: Deleting staging directory hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002
+26/10/28 05:52:06 INFO ShutdownHookManager: Shutdown hook called
+
+
+[2026-10-28 05:52:06.554]Container exited with a non-zero exit code 13. Error file: prelaunch.err.
+Last 4096 bytes of prelaunch.err :
+Last 4096 bytes of stderr :
+ava:569)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$2.run(ApplicationMaster.scala:757)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	... 8 more
+26/10/28 05:52:06 INFO ApplicationMaster: Final app status: FAILED, exitCode: 13, (reason: User class threw exception: java.io.IOException: Cannot run program "./environment/bin/python": error=2, No such file or directory
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1143)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1073)
+	at org.apache.spark.deploy.PythonRunner$.main(PythonRunner.scala:98)
+	at org.apache.spark.deploy.PythonRunner.main(PythonRunner.scala)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$2.run(ApplicationMaster.scala:757)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	... 8 more
+)
+26/10/28 05:52:06 ERROR ApplicationMaster: Uncaught exception: 
+org.apache.spark.SparkException: Exception thrown in awaitResult: 
+	at org.apache.spark.util.ThreadUtils$.awaitResult(ThreadUtils.scala:322)
+	at org.apache.spark.deploy.yarn.ApplicationMaster.runDriver(ApplicationMaster.scala:525)
+	at org.apache.spark.deploy.yarn.ApplicationMaster.run(ApplicationMaster.scala:284)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$3.run(ApplicationMaster.scala:954)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$3.run(ApplicationMaster.scala:953)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:712)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:439)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1878)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$.main(ApplicationMaster.scala:953)
+	at org.apache.spark.deploy.yarn.ApplicationMaster.main(ApplicationMaster.scala)
+Caused by: java.io.IOException: Cannot run program "./environment/bin/python": error=2, No such file or directory
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1143)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1073)
+	at org.apache.spark.deploy.PythonRunner$.main(PythonRunner.scala:98)
+	at org.apache.spark.deploy.PythonRunner.main(PythonRunner.scala)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$2.run(ApplicationMaster.scala:757)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	... 8 more
+26/10/28 05:52:06 INFO ApplicationMaster: Deleting staging directory hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002
+26/10/28 05:52:06 INFO ShutdownHookManager: Shutdown hook called
+
+
+For more detailed output, check the application tracking page: http://resource-manager:8088/cluster/app/application_1793159508153_0002 Then click on links to logs of each attempt.
+. Failing the application.
+	 ApplicationMaster host: N/A
+	 ApplicationMaster RPC port: -1
+	 queue: root.default
+	 start time: 1793166718994
+	 final status: FAILED
+	 tracking URL: http://resource-manager:8088/cluster/app/application_1793159508153_0002
+	 user: root
+26/10/28 05:52:07 ERROR Client: Application diagnostics message: Application application_1793159508153_0002 failed 2 times due to AM Container for appattempt_1793159508153_0002_000002 exited with  exitCode: 13
+Failing this attempt.Diagnostics: [2026-10-28 05:52:06.550]Exception from container-launch.
+Container id: container_1793159508153_0002_02_000001
+Exit code: 13
+
+[2026-10-28 05:52:06.554]Container exited with a non-zero exit code 13. Error file: prelaunch.err.
+Last 4096 bytes of prelaunch.err :
+Last 4096 bytes of stderr :
+ava:569)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$2.run(ApplicationMaster.scala:757)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	... 8 more
+26/10/28 05:52:06 INFO ApplicationMaster: Final app status: FAILED, exitCode: 13, (reason: User class threw exception: java.io.IOException: Cannot run program "./environment/bin/python": error=2, No such file or directory
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1143)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1073)
+	at org.apache.spark.deploy.PythonRunner$.main(PythonRunner.scala:98)
+	at org.apache.spark.deploy.PythonRunner.main(PythonRunner.scala)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$2.run(ApplicationMaster.scala:757)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	... 8 more
+)
+26/10/28 05:52:06 ERROR ApplicationMaster: Uncaught exception: 
+org.apache.spark.SparkException: Exception thrown in awaitResult: 
+	at org.apache.spark.util.ThreadUtils$.awaitResult(ThreadUtils.scala:322)
+	at org.apache.spark.deploy.yarn.ApplicationMaster.runDriver(ApplicationMaster.scala:525)
+	at org.apache.spark.deploy.yarn.ApplicationMaster.run(ApplicationMaster.scala:284)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$3.run(ApplicationMaster.scala:954)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$3.run(ApplicationMaster.scala:953)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:712)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:439)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1878)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$.main(ApplicationMaster.scala:953)
+	at org.apache.spark.deploy.yarn.ApplicationMaster.main(ApplicationMaster.scala)
+Caused by: java.io.IOException: Cannot run program "./environment/bin/python": error=2, No such file or directory
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1143)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1073)
+	at org.apache.spark.deploy.PythonRunner$.main(PythonRunner.scala:98)
+	at org.apache.spark.deploy.PythonRunner.main(PythonRunner.scala)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$2.run(ApplicationMaster.scala:757)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	... 8 more
+26/10/28 05:52:06 INFO ApplicationMaster: Deleting staging directory hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002
+26/10/28 05:52:06 INFO ShutdownHookManager: Shutdown hook called
+
+
+[2026-10-28 05:52:06.554]Container exited with a non-zero exit code 13. Error file: prelaunch.err.
+Last 4096 bytes of prelaunch.err :
+Last 4096 bytes of stderr :
+ava:569)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$2.run(ApplicationMaster.scala:757)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	... 8 more
+26/10/28 05:52:06 INFO ApplicationMaster: Final app status: FAILED, exitCode: 13, (reason: User class threw exception: java.io.IOException: Cannot run program "./environment/bin/python": error=2, No such file or directory
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1143)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1073)
+	at org.apache.spark.deploy.PythonRunner$.main(PythonRunner.scala:98)
+	at org.apache.spark.deploy.PythonRunner.main(PythonRunner.scala)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$2.run(ApplicationMaster.scala:757)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	... 8 more
+)
+26/10/28 05:52:06 ERROR ApplicationMaster: Uncaught exception: 
+org.apache.spark.SparkException: Exception thrown in awaitResult: 
+	at org.apache.spark.util.ThreadUtils$.awaitResult(ThreadUtils.scala:322)
+	at org.apache.spark.deploy.yarn.ApplicationMaster.runDriver(ApplicationMaster.scala:525)
+	at org.apache.spark.deploy.yarn.ApplicationMaster.run(ApplicationMaster.scala:284)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$3.run(ApplicationMaster.scala:954)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$3.run(ApplicationMaster.scala:953)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:712)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:439)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1878)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$.main(ApplicationMaster.scala:953)
+	at org.apache.spark.deploy.yarn.ApplicationMaster.main(ApplicationMaster.scala)
+Caused by: java.io.IOException: Cannot run program "./environment/bin/python": error=2, No such file or directory
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1143)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1073)
+	at org.apache.spark.deploy.PythonRunner$.main(PythonRunner.scala:98)
+	at org.apache.spark.deploy.PythonRunner.main(PythonRunner.scala)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$2.run(ApplicationMaster.scala:757)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.base/java.lang.ProcessImpl.forkAndExec(Native Method)
+	at java.base/java.lang.ProcessImpl.<init>(ProcessImpl.java:314)
+	at java.base/java.lang.ProcessImpl.start(ProcessImpl.java:244)
+	at java.base/java.lang.ProcessBuilder.start(ProcessBuilder.java:1110)
+	... 8 more
+26/10/28 05:52:06 INFO ApplicationMaster: Deleting staging directory hdfs://namenode:9000/user/root/.sparkStaging/application_1793159508153_0002
+26/10/28 05:52:06 INFO ShutdownHookManager: Shutdown hook called
+
+
+For more detailed output, check the application tracking page: http://resource-manager:8088/cluster/app/application_1793159508153_0002 Then click on links to logs of each attempt.
+. Failing the application.
+Exception in thread "main" org.apache.spark.SparkException: Application application_1793159508153_0002 finished with failed status
+	at org.apache.spark.deploy.yarn.Client.run(Client.scala:1325)
+	at org.apache.spark.deploy.yarn.YarnClusterApplication.start(Client.scala:1758)
+	at org.apache.spark.deploy.SparkSubmit.org$apache$spark$deploy$SparkSubmit$$runMain(SparkSubmit.scala:1020)
+	at org.apache.spark.deploy.SparkSubmit.doRunMain$1(SparkSubmit.scala:192)
+	at org.apache.spark.deploy.SparkSubmit.submit(SparkSubmit.scala:215)
+	at org.apache.spark.deploy.SparkSubmit.doSubmit(SparkSubmit.scala:91)
+	at org.apache.spark.deploy.SparkSubmit$$anon$2.doSubmit(SparkSubmit.scala:1111)
+	at org.apache.spark.deploy.SparkSubmit$.main(SparkSubmit.scala:1120)
+	at org.apache.spark.deploy.SparkSubmit.main(SparkSubmit.scala)
+26/10/28 05:52:07 INFO ShutdownHookManager: Shutdown hook called
+26/10/28 05:52:07 INFO ShutdownHookManager: Deleting directory /tmp/spark-36ce3bc5-8ea0-4f63-93ac-27ea0717ed7c
+26/10/28 05:52:07 INFO ShutdownHookManager: Deleting directory /tmp/spark-59b15979-a494-45df-94fb-56c9a5acec21
+
+2026-10-28 05:53:52,727 - INFO - Starting Spark job submission...
+2026-10-28 05:53:54,031 - ERROR - Spark job failed with return code 1
+2026-10-28 05:53:54,031 - ERROR - Error output: Error: Unrecognized option: --archiveshdfs:///shared/venv3.11.tar.gz#environment
+
+Usage: spark-submit [options] <app jar | python file | R file> [app arguments]
+Usage: spark-submit --kill [submission ID] --master [spark://...]
+Usage: spark-submit --status [submission ID] --master [spark://...]
+Usage: spark-submit run-example [options] example-class [example args]
+
+Options:
+  --master MASTER_URL         spark://host:port, mesos://host:port, yarn,
+                              k8s://https://host:port, or local (Default: local[*]).
+  --deploy-mode DEPLOY_MODE   Whether to launch the driver program locally ("client") or
+                              on one of the worker machines inside the cluster ("cluster")
+                              (Default: client).
+  --class CLASS_NAME          Your application's main class (for Java / Scala apps).
+  --name NAME                 A name of your application.
+  --jars JARS                 Comma-separated list of jars to include on the driver
+                              and executor classpaths.
+  --packages                  Comma-separated list of maven coordinates of jars to include
+                              on the driver and executor classpaths. Will search the local
+                              maven repo, then maven central and any additional remote
+                              repositories given by --repositories. The format for the
+                              coordinates should be groupId:artifactId:version.
+  --exclude-packages          Comma-separated list of groupId:artifactId, to exclude while
+                              resolving the dependencies provided in --packages to avoid
+                              dependency conflicts.
+  --repositories              Comma-separated list of additional remote repositories to
+                              search for the maven coordinates given with --packages.
+  --py-files PY_FILES         Comma-separated list of .zip, .egg, or .py files to place
+                              on the PYTHONPATH for Python apps.
+  --files FILES               Comma-separated list of files to be placed in the working
+                              directory of each executor. File paths of these files
+                              in executors can be accessed via SparkFiles.get(fileName).
+  --archives ARCHIVES         Comma-separated list of archives to be extracted into the
+                              working directory of each executor.
+
+  --conf, -c PROP=VALUE       Arbitrary Spark configuration property.
+  --properties-file FILE      Path to a file from which to load extra properties. If not
+                              specified, this will look for conf/spark-defaults.conf.
+
+  --driver-memory MEM         Memory for driver (e.g. 1000M, 2G) (Default: 1024M).
+  --driver-java-options       Extra Java options to pass to the driver.
+  --driver-library-path       Extra library path entries to pass to the driver.
+  --driver-class-path         Extra class path entries to pass to the driver. Note that
+                              jars added with --jars are automatically included in the
+                              classpath.
+
+  --executor-memory MEM       Memory per executor (e.g. 1000M, 2G) (Default: 1G).
+
+  --proxy-user NAME           User to impersonate when submitting the application.
+                              This argument does not work with --principal / --keytab.
+
+  --help, -h                  Show this help message and exit.
+  --verbose, -v               Print additional debug output.
+  --version,                  Print the version of current Spark.
+
+ Spark Connect only:
+   --remote CONNECT_URL       URL to connect to the server for Spark Connect, e.g.,
+                              sc://host:port. --master and --deploy-mode cannot be set
+                              together with this option. This option is experimental, and
+                              might change between minor releases.
+
+ Cluster deploy mode only:
+  --driver-cores NUM          Number of cores used by the driver, only in cluster mode
+                              (Default: 1).
+
+ Spark standalone or Mesos with cluster deploy mode only:
+  --supervise                 If given, restarts the driver on failure.
+
+ Spark standalone, Mesos or K8s with cluster deploy mode only:
+  --kill SUBMISSION_ID        If given, kills the driver specified.
+  --status SUBMISSION_ID      If given, requests the status of the driver specified.
+
+ Spark standalone, Mesos and Kubernetes only:
+  --total-executor-cores NUM  Total cores for all executors.
+
+ Spark standalone, YARN and Kubernetes only:
+  --executor-cores NUM        Number of cores used by each executor. (Default: 1 in
+                              YARN and K8S modes, or all available cores on the worker
+                              in standalone mode).
+
+ Spark on YARN and Kubernetes only:
+  --num-executors NUM         Number of executors to launch (Default: 2).
+                              If dynamic allocation is enabled, the initial number of
+                              executors will be at least NUM.
+  --principal PRINCIPAL       Principal to be used to login to KDC.
+  --keytab KEYTAB             The full path to the file that contains the keytab for the
+                              principal specified above.
+
+ Spark on YARN only:
+  --queue QUEUE_NAME          The YARN queue to submit to (Default: "default").
+      
+
+2026-10-28 05:59:52,414 - INFO - Starting Spark job submission...
+2026-10-28 05:59:53,812 - ERROR - Spark job failed with return code 1
+2026-10-28 05:59:53,812 - ERROR - Error output: Error: Unrecognized option: --archiveshdfs:///shared/venv3.11.tar.gz#environment
+
+Usage: spark-submit [options] <app jar | python file | R file> [app arguments]
+Usage: spark-submit --kill [submission ID] --master [spark://...]
+Usage: spark-submit --status [submission ID] --master [spark://...]
+Usage: spark-submit run-example [options] example-class [example args]
+
+Options:
+  --master MASTER_URL         spark://host:port, mesos://host:port, yarn,
+                              k8s://https://host:port, or local (Default: local[*]).
+  --deploy-mode DEPLOY_MODE   Whether to launch the driver program locally ("client") or
+                              on one of the worker machines inside the cluster ("cluster")
+                              (Default: client).
+  --class CLASS_NAME          Your application's main class (for Java / Scala apps).
+  --name NAME                 A name of your application.
+  --jars JARS                 Comma-separated list of jars to include on the driver
+                              and executor classpaths.
+  --packages                  Comma-separated list of maven coordinates of jars to include
+                              on the driver and executor classpaths. Will search the local
+                              maven repo, then maven central and any additional remote
+                              repositories given by --repositories. The format for the
+                              coordinates should be groupId:artifactId:version.
+  --exclude-packages          Comma-separated list of groupId:artifactId, to exclude while
+                              resolving the dependencies provided in --packages to avoid
+                              dependency conflicts.
+  --repositories              Comma-separated list of additional remote repositories to
+                              search for the maven coordinates given with --packages.
+  --py-files PY_FILES         Comma-separated list of .zip, .egg, or .py files to place
+                              on the PYTHONPATH for Python apps.
+  --files FILES               Comma-separated list of files to be placed in the working
+                              directory of each executor. File paths of these files
+                              in executors can be accessed via SparkFiles.get(fileName).
+  --archives ARCHIVES         Comma-separated list of archives to be extracted into the
+                              working directory of each executor.
+
+  --conf, -c PROP=VALUE       Arbitrary Spark configuration property.
+  --properties-file FILE      Path to a file from which to load extra properties. If not
+                              specified, this will look for conf/spark-defaults.conf.
+
+  --driver-memory MEM         Memory for driver (e.g. 1000M, 2G) (Default: 1024M).
+  --driver-java-options       Extra Java options to pass to the driver.
+  --driver-library-path       Extra library path entries to pass to the driver.
+  --driver-class-path         Extra class path entries to pass to the driver. Note that
+                              jars added with --jars are automatically included in the
+                              classpath.
+
+  --executor-memory MEM       Memory per executor (e.g. 1000M, 2G) (Default: 1G).
+
+  --proxy-user NAME           User to impersonate when submitting the application.
+                              This argument does not work with --principal / --keytab.
+
+  --help, -h                  Show this help message and exit.
+  --verbose, -v               Print additional debug output.
+  --version,                  Print the version of current Spark.
+
+ Spark Connect only:
+   --remote CONNECT_URL       URL to connect to the server for Spark Connect, e.g.,
+                              sc://host:port. --master and --deploy-mode cannot be set
+                              together with this option. This option is experimental, and
+                              might change between minor releases.
+
+ Cluster deploy mode only:
+  --driver-cores NUM          Number of cores used by the driver, only in cluster mode
+                              (Default: 1).
+
+ Spark standalone or Mesos with cluster deploy mode only:
+  --supervise                 If given, restarts the driver on failure.
+
+ Spark standalone, Mesos or K8s with cluster deploy mode only:
+  --kill SUBMISSION_ID        If given, kills the driver specified.
+  --status SUBMISSION_ID      If given, requests the status of the driver specified.
+
+ Spark standalone, Mesos and Kubernetes only:
+  --total-executor-cores NUM  Total cores for all executors.
+
+ Spark standalone, YARN and Kubernetes only:
+  --executor-cores NUM        Number of cores used by each executor. (Default: 1 in
+                              YARN and K8S modes, or all available cores on the worker
+                              in standalone mode).
+
+ Spark on YARN and Kubernetes only:
+  --num-executors NUM         Number of executors to launch (Default: 2).
+                              If dynamic allocation is enabled, the initial number of
+                              executors will be at least NUM.
+  --principal PRINCIPAL       Principal to be used to login to KDC.
+  --keytab KEYTAB             The full path to the file that contains the keytab for the
+                              principal specified above.
+
+ Spark on YARN only:
+  --queue QUEUE_NAME          The YARN queue to submit to (Default: "default").
+      
+
+2026-10-28 06:00:16,967 - INFO - Starting Spark job submission...
+2026-10-28 06:00:18,281 - ERROR - Spark job failed with return code 1
+2026-10-28 06:00:18,281 - ERROR - Error output: Error: Unrecognized option: --archiveshdfs:///shared/venv3.11.tar.gz#environment
+
+Usage: spark-submit [options] <app jar | python file | R file> [app arguments]
+Usage: spark-submit --kill [submission ID] --master [spark://...]
+Usage: spark-submit --status [submission ID] --master [spark://...]
+Usage: spark-submit run-example [options] example-class [example args]
+
+Options:
+  --master MASTER_URL         spark://host:port, mesos://host:port, yarn,
+                              k8s://https://host:port, or local (Default: local[*]).
+  --deploy-mode DEPLOY_MODE   Whether to launch the driver program locally ("client") or
+                              on one of the worker machines inside the cluster ("cluster")
+                              (Default: client).
+  --class CLASS_NAME          Your application's main class (for Java / Scala apps).
+  --name NAME                 A name of your application.
+  --jars JARS                 Comma-separated list of jars to include on the driver
+                              and executor classpaths.
+  --packages                  Comma-separated list of maven coordinates of jars to include
+                              on the driver and executor classpaths. Will search the local
+                              maven repo, then maven central and any additional remote
+                              repositories given by --repositories. The format for the
+                              coordinates should be groupId:artifactId:version.
+  --exclude-packages          Comma-separated list of groupId:artifactId, to exclude while
+                              resolving the dependencies provided in --packages to avoid
+                              dependency conflicts.
+  --repositories              Comma-separated list of additional remote repositories to
+                              search for the maven coordinates given with --packages.
+  --py-files PY_FILES         Comma-separated list of .zip, .egg, or .py files to place
+                              on the PYTHONPATH for Python apps.
+  --files FILES               Comma-separated list of files to be placed in the working
+                              directory of each executor. File paths of these files
+                              in executors can be accessed via SparkFiles.get(fileName).
+  --archives ARCHIVES         Comma-separated list of archives to be extracted into the
+                              working directory of each executor.
+
+  --conf, -c PROP=VALUE       Arbitrary Spark configuration property.
+  --properties-file FILE      Path to a file from which to load extra properties. If not
+                              specified, this will look for conf/spark-defaults.conf.
+
+  --driver-memory MEM         Memory for driver (e.g. 1000M, 2G) (Default: 1024M).
+  --driver-java-options       Extra Java options to pass to the driver.
+  --driver-library-path       Extra library path entries to pass to the driver.
+  --driver-class-path         Extra class path entries to pass to the driver. Note that
+                              jars added with --jars are automatically included in the
+                              classpath.
+
+  --executor-memory MEM       Memory per executor (e.g. 1000M, 2G) (Default: 1G).
+
+  --proxy-user NAME           User to impersonate when submitting the application.
+                              This argument does not work with --principal / --keytab.
+
+  --help, -h                  Show this help message and exit.
+  --verbose, -v               Print additional debug output.
+  --version,                  Print the version of current Spark.
+
+ Spark Connect only:
+   --remote CONNECT_URL       URL to connect to the server for Spark Connect, e.g.,
+                              sc://host:port. --master and --deploy-mode cannot be set
+                              together with this option. This option is experimental, and
+                              might change between minor releases.
+
+ Cluster deploy mode only:
+  --driver-cores NUM          Number of cores used by the driver, only in cluster mode
+                              (Default: 1).
+
+ Spark standalone or Mesos with cluster deploy mode only:
+  --supervise                 If given, restarts the driver on failure.
+
+ Spark standalone, Mesos or K8s with cluster deploy mode only:
+  --kill SUBMISSION_ID        If given, kills the driver specified.
+  --status SUBMISSION_ID      If given, requests the status of the driver specified.
+
+ Spark standalone, Mesos and Kubernetes only:
+  --total-executor-cores NUM  Total cores for all executors.
+
+ Spark standalone, YARN and Kubernetes only:
+  --executor-cores NUM        Number of cores used by each executor. (Default: 1 in
+                              YARN and K8S modes, or all available cores on the worker
+                              in standalone mode).
+
+ Spark on YARN and Kubernetes only:
+  --num-executors NUM         Number of executors to launch (Default: 2).
+                              If dynamic allocation is enabled, the initial number of
+                              executors will be at least NUM.
+  --principal PRINCIPAL       Principal to be used to login to KDC.
+  --keytab KEYTAB             The full path to the file that contains the keytab for the
+                              principal specified above.
+
+ Spark on YARN only:
+  --queue QUEUE_NAME          The YARN queue to submit to (Default: "default").
+      
+
+2026-10-28 06:02:15,861 - INFO - Starting Spark job submission...
+2026-10-28 06:11:06,834 - INFO - Starting Spark job submission...
