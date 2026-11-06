@@ -14,7 +14,7 @@ signal_schema = StructType([
     StructField("patient_id", StringType(), True),
     StructField("eda", ArrayType(DoubleType()), True),
     StructField("ibi", ArrayType(DoubleType()), True),
-    StructField("timestamp", DoubleType(), True),
+    StructField("timestamp", DoubleType(), True)
 ])
 
 kafka_df = spark.readStream \
@@ -42,7 +42,7 @@ parsed_df = kafka_df.select(
 
 query = parsed_df.writeStream \
     .format("parquet") \
-    .option("path", "/signals") \
+    .option("path", "/data/signals") \
     .option("checkpointLocation", "/tmp/checkpoint-kafka2hdfs") \
     .partitionBy('patient_id') \
     .trigger(availableNow=True) \
