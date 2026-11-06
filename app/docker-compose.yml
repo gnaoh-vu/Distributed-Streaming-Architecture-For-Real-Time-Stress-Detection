@@ -1,15 +1,24 @@
 services:
-  signal-service:
-    build: ./signal_service
+  # signal-service:
+  #   build: ./signal_service
+  #   user: root
+  #   ports:
+  #     - 8000:8000
+  #   volumes:
+  #     - ./signal_service:/app
+  #   networks:
+  #     - project-network
+
+  trend-service:
+    build: ./trend_service
     user: root
     ports:
-      - 8000:8000
+      - 8001:8000
     volumes:
-      - ./signal_service:/app
+      - ./trend_service:/app
+      - ./trend_service/db:/app/db
     networks:
       - project-network
-
-  # web:
 
 networks:
   project-network:

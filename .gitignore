@@ -15,7 +15,7 @@ clusters/stress-test
 
 iot-*/
 target
-app/trend_service
+db/
 
 ADARP/
 WESAD/

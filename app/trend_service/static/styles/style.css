@@ -1,0 +1,242 @@
+:root {
+    --bg-color: #ffffff;
+    --card-bg: #ffffff;
+    --text-main: #16181c;
+    --text-sub: #8a8f98;
+    --border-color: #e3e5e8;
+    --accent-blue: #2b6f76;
+    --accent-green: #2f7d4f;
+    --accent-red: #c0392b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    background: var(--bg-color);
+    color: var(--text-main);
+    font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+header h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-sub);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    animation: pulse 1.8s infinite;
+}
+
+@keyframes pulse {
+    50% { opacity: 0.2; }
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 22px;
+    flex: 1;
+}
+
+.patient-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-self: start;
+}
+
+.patient-list h3 {
+    padding-bottom: 10px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-sub);
+    font-size: 0.72rem;
+    font-weight: 500;
+}
+
+.patient-list label {
+    color: var(--text-sub);
+    font-size: 0.78rem;
+}
+
+#patient-selector {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-main);
+    font: inherit;
+}
+
+#patient-list-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.patient-card {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-left: 2px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-main);
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+
+.patient-card strong {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.patient-card p {
+    margin-top: 3px;
+    color: var(--text-sub);
+    font-size: 0.78rem;
+}
+
+.patient-card.active {
+    border-left-color: var(--accent-blue);
+}
+
+.main-panel {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.metric-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(148px, 1fr));
+    border-top: 1px solid var(--border-color);
+    border-left: 1px solid var(--border-color);
+}
+
+.metric-card {
+    padding: 14px 16px;
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.metric-label {
+    display: block;
+    color: var(--text-sub);
+    font-size: 0.72rem;
+}
+
+.metric-value {
+    margin-top: 6px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 1.3rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.chart-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.chart-header h3 {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.chart-description {
+    margin-top: 3px;
+    color: var(--text-sub);
+    font-size: 0.78rem;
+}
+
+.tabs {
+    display: flex;
+    border: 1px solid var(--border-color);
+}
+
+.tab {
+    padding: 7px 14px;
+    border: 0;
+    border-right: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-sub);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+
+.tab:last-child { border-right: 0; }
+
+.tab.active {
+    background: var(--accent-blue);
+    color: white;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 460px;
+}
+
+.chart-container.heatmap-view {
+    height: 560px;
+}
+
+#trendChart {
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--border-color);
+    background: white;
+}
+
+@media (max-width: 720px) {
+    body { padding: 16px; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .metric-cards { grid-template-columns: 1fr; }
+    .chart-header { align-items: flex-start; flex-direction: column; }
+    .chart-container { height: 380px; }
+    .chart-container.heatmap-view { height: 520px; }
+}

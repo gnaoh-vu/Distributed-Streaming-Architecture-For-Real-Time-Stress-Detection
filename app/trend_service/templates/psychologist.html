@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psychologist Clinical Review</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="/static/styles/psychologist.css" rel="stylesheet">
+</head>
+<body>
+    <div class="shell">
+        <aside class="patient-panel">
+            <div class="service-mark">
+                <span class="mark-line"></span>
+                Clinical review
+            </div>
+            <div class="patient-heading">
+                <p>Selected patient</p>
+                <h1>Patient <span id="selected-patient">--</span></h1>
+            </div>
+            <label for="patient-selector">Patient record</label>
+            <div class="select-wrap">
+                <select id="patient-selector" disabled>
+                    <option>Loading patients...</option>
+                </select>
+            </div>
+            <nav aria-label="Dashboard sections">
+                <button class="section-link active" data-target="overview">Overview</button>
+                <button class="section-link" data-target="ans-chart">ANS regulation</button>
+                <button class="section-link" data-target="load-chart">Stress load</button>
+                <button class="section-link" data-target="recovery-chart">Recovery speed</button>
+            </nav>
+            <div class="connection-status">
+                <span class="status-dot"></span>
+                Analysis connected
+            </div>
+        </aside>
+
+        <main>
+            <header>
+                <div>
+                    <p class="eyebrow">Physiological trend review</p>
+                    <h2>Weekly clinical overview</h2>
+                </div>
+                <span class="review-date" id="review-date"></span>
+            </header>
+
+            <section class="summary-strip" id="overview" aria-label="Patient summary">
+                <article>
+                    <span>Weeks observed</span>
+                    <strong id="weeks-observed">--</strong>
+                </article>
+                <article>
+                    <span>Latest ANS ratio</span>
+                    <strong id="latest-ans">--</strong>
+                </article>
+                <article>
+                    <span>Median episode</span>
+                    <strong id="median-recovery">--</strong>
+                </article>
+            </section>
+
+            <div class="chart-grid">
+                <section class="chart-panel ans-panel" id="ans-chart">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-index">01</span>
+                            <h3>ANS dysregulation</h3>
+                        </div>
+                        <p>Weekly ratio of dysregulated windows</p>
+                    </div>
+                    <div class="chart" id="ansChart" aria-label="ANS dysregulation chart"></div>
+                </section>
+
+                <section class="chart-panel load-panel" id="load-chart">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-index">02</span>
+                            <h3>Stress-load change</h3>
+                        </div>
+                        <p>Weekly physiological signal improvements</p>
+                    </div>
+                    <div class="chart" id="loadChart" aria-label="Stress load change chart"></div>
+                </section>
+
+                <section class="chart-panel recovery-panel" id="recovery-chart">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="panel-index">03</span>
+                            <h3>Recovery episodes</h3>
+                        </div>
+                        <p>Distribution of consecutive abnormal windows</p>
+                    </div>
+                    <div class="chart" id="recoveryChart" aria-label="Recovery episode histogram"></div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <script src="/static/sources/psychologist.js"></script>
+</body>
+</html>
