@@ -23,7 +23,7 @@ schema = StructType([
 
 df = spark.read \
     .schema(schema) \
-    .parquet('/signals')
+    .parquet('/data/signals')
 
 window_df = df.groupBy(
     F.col('patient_id'),
@@ -159,4 +159,6 @@ result_df = week_df \
 
 result_df.show()
 
-
+result_df.write \
+    .mode('overwrite') \
+    .csv('/analyses/stress_load.csv')

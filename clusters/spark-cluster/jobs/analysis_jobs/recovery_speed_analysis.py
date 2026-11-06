@@ -18,12 +18,12 @@ schema = StructType([
     StructField("patient_id", StringType(), True),
     StructField("eda", ArrayType(DoubleType()), True),
     StructField("ibi", ArrayType(DoubleType()), True),
-    StructField("timestamp", TimestampType(), True),
+    StructField("timestamp", TimestampType(), True)
 ])
 
 df = spark.read \
     .schema(schema) \
-    .parquet('/signals')
+    .parquet('/data/signals')
 
 window_df = df.groupBy(
     F.col('patient_id'),
@@ -141,3 +141,7 @@ result_df = joined \
     # .where(F.col('number_consecutive_abnormal_windows') >= 6)
 
 result_df.show()
+
+result_df.write \
+    .mode('overwrite') \
+    .csv('/analyses/recovery_speed.csv')
