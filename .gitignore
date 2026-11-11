@@ -3,14 +3,14 @@
 *.tar.gz
 venv3.11/
 __pycache__/
+tmp/
 clusters/emqx-cluster/*/data/*
 clusters/emqx-cluster/*/log/*
 clusters/kafka-tutorial/
 clusters/kafka-cluster/*/data/*
 clusters/kafka-cluster/*/logs/*
 clusters/spark-cluster/datanode/data/*
-clusters/spark-cluster/namenode/data/*
-clusters/spark-cluster/namenode/data/*
+clusters/spark-cluster/namenode/mount/*
 clusters/stress-test
 
 iot-*/

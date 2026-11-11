@@ -26,12 +26,11 @@ async def lifespan(app: FastAPI):
     db = Database()
     db.init_tables()
     hdfs_reader.connect_hdfs()
-    consumer_task = asyncio.create_task(asyncio.to_thread(run_kafka_consumer))
+    # consumer_task = asyncio.create_task(asyncio.to_thread(run_kafka_consumer))
 
     yield
 
     running = False
-    await consumer_task
 
 app = FastAPI(lifespan=lifespan)
 templates = Jinja2Templates(directory="templates")
@@ -68,6 +67,7 @@ def psychologist_dashboard(request: Request):
 async def get_specialist_analysis(analysis: hdfs_reader.Analysis, patient_id: str | None = None):
     try:
         data = hdfs_reader.read_analysis_csv(analysis)
+        print(data)
     except (HdfsError, RequestException, OSError) as error:
         raise HTTPException(
             status_code=503,
@@ -78,6 +78,8 @@ async def get_specialist_analysis(analysis: hdfs_reader.Analysis, patient_id: st
             row for row in data
             if str(row.get("patient_id")).strip() == patient_id
         ]
+
+        print(data)
     return responses.JSONResponse(
         content=jsonable_encoder(data)
     )

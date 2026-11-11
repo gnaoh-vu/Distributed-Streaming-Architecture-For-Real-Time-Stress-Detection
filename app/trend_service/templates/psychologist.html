@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="/static/styles/psychologist.css" rel="stylesheet">
+    <link href="/static/styles/psychologist.css?v=20261111-5" rel="stylesheet">
 </head>
 <body>
     <div class="shell">
@@ -30,7 +30,7 @@
                 <button class="section-link active" data-target="overview">Overview</button>
                 <button class="section-link" data-target="ans-chart">ANS regulation</button>
                 <button class="section-link" data-target="load-chart">Stress load</button>
-                <button class="section-link" data-target="recovery-chart">Recovery speed</button>
+                <button class="section-link" data-target="recovery-chart">Episode runs</button>
             </nav>
             <div class="connection-status">
                 <span class="status-dot"></span>
@@ -44,7 +44,15 @@
                     <p class="eyebrow">Physiological trend review</p>
                     <h2>Weekly clinical overview</h2>
                 </div>
-                <span class="review-date" id="review-date"></span>
+                <div class="header-actions">
+                    <span class="review-date" id="review-date"></span>
+                    <button
+                        class="run-jobs-button"
+                        type="button"
+                        disabled
+                        title="Job submission is not connected yet"
+                    >Run analyses</button>
+                </div>
             </header>
 
             <section class="summary-strip" id="overview" aria-label="Patient summary">
@@ -57,7 +65,7 @@
                     <strong id="latest-ans">--</strong>
                 </article>
                 <article>
-                    <span>Median episode</span>
+                    <span>Median run length</span>
                     <strong id="median-recovery">--</strong>
                 </article>
             </section>
@@ -78,9 +86,20 @@
                     <div class="panel-heading">
                         <div>
                             <span class="panel-index">02</span>
-                            <h3>Stress-load change</h3>
+                            <h3>Weekly physiological signal AUC</h3>
                         </div>
-                        <p>Weekly physiological signal improvements</p>
+                        <p>Weekly EDA, IBI, and HRV signal totals; each has its own scale</p>
+                    </div>
+                    <div class="signal-tabs" role="tablist" aria-label="Physiological signal">
+                        <button class="signal-tab active" id="eda-tab" type="button" role="tab" aria-selected="true" data-signal="eda">
+                            EDA
+                        </button>
+                        <button class="signal-tab" id="ibi-tab" type="button" role="tab" aria-selected="false" data-signal="ibi">
+                            IBI
+                        </button>
+                        <button class="signal-tab" id="hrv-tab" type="button" role="tab" aria-selected="false" data-signal="hrv">
+                            HRV
+                        </button>
                     </div>
                     <div class="chart" id="loadChart" aria-label="Stress load change chart"></div>
                 </section>
@@ -89,16 +108,16 @@
                     <div class="panel-heading">
                         <div>
                             <span class="panel-index">03</span>
-                            <h3>Recovery episodes</h3>
+                            <h3>Abnormal-window runs</h3>
                         </div>
-                        <p>Distribution of consecutive abnormal windows</p>
+                        <p>Each point is an episode; higher points mean longer abnormal runs, not measured recovery time.</p>
                     </div>
-                    <div class="chart" id="recoveryChart" aria-label="Recovery episode histogram"></div>
+                    <div class="chart" id="recoveryChart" aria-label="Abnormal run length over episode start date"></div>
                 </section>
             </div>
         </main>
     </div>
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-    <script src="/static/sources/psychologist.js"></script>
+    <script src="/static/sources/psychologist.js?v=20261111-4"></script>
 </body>
 </html>

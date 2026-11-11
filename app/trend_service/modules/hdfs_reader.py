@@ -30,7 +30,7 @@ def read_analysis_csv(type: Analysis):
             with client.read(f'{partsDir}/{file}') as reader:
                 dfs.append(pd.read_csv(reader))
 
-        full_df = pd.concat(dfs, ignore_index=True)
+        full_df = pd.concat(dfs, ignore_index=True).fillna(0)
         results = full_df.to_dict(orient="records")
 
         return results

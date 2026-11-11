@@ -5,6 +5,8 @@ const numeric = value => {
 
 const selector = document.getElementById("patient-selector");
 const plotConfig = { responsive: true, displaylogo: false };
+let stressLoadRows = [];
+let activeSignal = "eda";
 const baseLayout = {
     paper_bgcolor: "#ffffff",
     plot_bgcolor: "#ffffff",
@@ -56,14 +58,16 @@ function renderAns(rows) {
         hovertemplate: "%{x}<br>Severity %{y:.2f}<extra></extra>"
     }], {
         ...baseLayout,
+        margin: { l: 68, r: 82, t: 38, b: 55 },
         bargap: 0.48,
         yaxis: { title: "Dysregulated (%)", rangemode: "tozero", ticksuffix: "%", gridcolor: "#eceef0" },
         yaxis2: {
-            title: "Severity",
+            title: { text: "Severity", standoff: 14 },
             overlaying: "y",
             side: "right",
             showgrid: false,
-            rangemode: "tozero"
+            rangemode: "tozero",
+            automargin: true
         },
         legend: { orientation: "h", x: 0, y: 1.12 },
         annotations: rows.length ? [] : [{
@@ -85,76 +89,137 @@ function renderAns(rows) {
 
 function renderStressLoad(rows) {
     rows.sort((a, b) => String(a.window_start).localeCompare(String(b.window_start)));
-    const weeks = rows.map(row => shortDate(row.window_start));
-    Plotly.react("loadChart", ["EDA", "IBI", "HRV"].map((name, index) => ({
-        x: weeks,
-        y: rows.map(row => numeric(row[[ "eda_improv", "ibi_improv", "hrv_improv"][index]]) * 100),
-        type: "bar",
-        name,
-        marker: { color: ["#2b6f76", "#a9720d", "#a3486b"][index] },
-        hovertemplate: `%{x}<br>${name} %{y:.1f}%<extra></extra>`
-    })), {
+    const signals = [
+        { id: "eda", name: "EDA AUC", field: "auc_eda", color: "#2b6f76" },
+        { id: "ibi", name: "IBI AUC", field: "auc_ibi", color: "#a9720d" },
+        { id: "hrv", name: "HRV AUC", field: "auc_hrv", color: "#a3486b" }
+    ];
+    const hasAucFields = rows.length > 0 && signals.every(signal =>
+        Object.prototype.hasOwnProperty.call(rows[0], signal.field)
+    );
+
+    if (!hasAucFields) {
+        Plotly.react("loadChart", [], {
+            ...baseLayout,
+            annotations: [{
+                text: rows.length
+                    ? "AUC output fields unavailable; rerun the updated stress-load analysis"
+                    : "No weekly stress-load observations",
+                showarrow: false,
+                x: 0.5,
+                y: 0.5,
+                xref: "paper",
+                yref: "paper"
+            }]
+        }, plotConfig);
+        return;
+    }
+
+    const signal = signals.find(item => item.id === activeSignal) || signals[0];
+    Plotly.react("loadChart", [{
+        x: rows.map(row => row.window_start),
+        y: rows.map(row => numeric(row[signal.field])),
+        type: "scatter",
+        mode: "lines+markers",
+        line: { color: signal.color, width: 2 },
+        marker: { size: 6, color: signal.color },
+        connectgaps: false,
+        hovertemplate: `%{x|%b %d, %Y}<br>${signal.name}: %{y:.3g}<extra></extra>`
+    }], {
         ...baseLayout,
-        barmode: "group",
-        bargap: 0.18,
-        bargroupgap: 0.06,
+        margin: { l: 72, r: 24, t: 20, b: 58 },
         yaxis: {
-            title: "Change (%)",
-            zeroline: true,
-            zerolinecolor: "#81868e",
-            ticksuffix: "%",
+            title: signal.name,
+            rangemode: "tozero",
+            gridcolor: "#eceef0",
+            automargin: true
+        },
+        xaxis: {
+            type: "date",
+            tickformat: "%b %d",
+            title: "Week",
             gridcolor: "#eceef0"
         },
-        legend: { orientation: "h", x: 0, y: 1.12 }
     }, plotConfig);
 }
 
+function activateSignal(signalId) {
+    activeSignal = signalId;
+    document.querySelectorAll(".signal-tab").forEach(tab => {
+        const active = tab.dataset.signal === signalId;
+        tab.classList.toggle("active", active);
+        tab.setAttribute("aria-selected", String(active));
+    });
+    renderStressLoad(stressLoadRows);
+}
+
 function renderRecovery(rows) {
-    const values = rows.map(row => numeric(row.number_consecutive_abnormal_windows)).filter(Boolean);
-    const distribution = {};
-    values.forEach(value => { distribution[value] = (distribution[value] || 0) + 1; });
-    const lengths = Object.keys(distribution).map(Number).sort((a, b) => a - b);
+    const episodes = rows
+        .map(row => ({
+            start: row.region_start,
+            windows: numeric(row.number_consecutive_abnormal_windows)
+        }))
+        .filter(episode => episode.windows > 0)
+        .sort((a, b) => String(a.start).localeCompare(String(b.start)));
+    const values = episodes.map(episode => episode.windows);
+    const sorted = [...values].sort((a, b) => a - b);
+    const middle = Math.floor(sorted.length / 2);
+    const median = sorted.length
+        ? (sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2)
+        : null;
+    const dates = episodes.map(episode => episode.start);
+
     Plotly.react("recoveryChart", [{
-        x: lengths,
-        y: lengths.map(length => distribution[length]),
-        type: "bar",
-        marker: { color: "#2b6f76", opacity: 0.92 },
-        hovertemplate: "%{x} consecutive window(s)<br>%{y} episode(s)<extra></extra>"
+        x: dates,
+        y: values,
+        type: "scatter",
+        mode: "markers",
+        marker: {
+            size: 11,
+            color: values.map(value => value > median ? "#a3486b" : "#2b6f76"),
+            line: { color: "#ffffff", width: 1.5 }
+        },
+        customdata: values.map((value, index) => [index + 1, value * 2.5 + 2.5]),
+        hovertemplate: "Episode %{customdata[0]}<br>%{x|%b %d, %Y}<br>%{y} consecutive abnormal windows<br>About %{customdata[1]:.1f} min of overlapping window coverage<extra></extra>"
     }], {
         ...baseLayout,
-        bargap: 0.28,
+        margin: { l: 68, r: 24, t: 18, b: 55 },
         xaxis: {
-            title: "Consecutive abnormal windows",
-            dtick: 1,
-            gridcolor: "#eceef0",
-            linecolor: "#dde0e3"
+            ...baseLayout.xaxis,
+            type: "date",
+            title: "Episode start date",
+            tickformat: "%b %d"
         },
         yaxis: {
-            title: "Episodes",
+            title: "Consecutive abnormal windows",
             rangemode: "tozero",
             dtick: 1,
             gridcolor: "#eceef0",
             linecolor: "#dde0e3"
         },
-        annotations: lengths.length ? [] : [{
-            text: "No abnormal episodes",
+        shapes: median === null ? [] : [{
+            type: "line",
+            xref: "paper",
+            x0: 0,
+            x1: 1,
+            y0: median,
+            y1: median,
+            line: { color: "#a9720d", width: 1.5, dash: "dash" }
+        }],
+        annotations: median === null ? [{
+            text: "No abnormal-window episodes to display",
             showarrow: false,
             x: 0.5,
             y: 0.5,
             xref: "paper",
             yref: "paper"
-        }]
+        }] : []
     }, plotConfig);
 
-    if (!values.length) {
+    if (!episodes.length) {
         document.getElementById("median-recovery").textContent = "--";
         return;
     }
-    const sorted = [...values].sort((a, b) => a - b);
-    const middle = Math.floor(sorted.length / 2);
-    const median = sorted.length % 2
-        ? sorted[middle]
-        : (sorted[middle - 1] + sorted[middle]) / 2;
     document.getElementById("median-recovery").textContent =
         `${Number.isInteger(median) ? median : median.toFixed(1)} windows`;
 }
@@ -171,7 +236,8 @@ async function loadPatient(patientId) {
             fetchJson(`/specialist-analysis/recovery_speed?patient_id=${encodeURIComponent(patientId)}`)
         ]);
         renderAns(ans);
-        renderStressLoad(load);
+        stressLoadRows = load;
+        renderStressLoad(stressLoadRows);
         renderRecovery(recovery);
     } catch (error) {
         console.error("Could not load specialist analysis", error);
@@ -201,6 +267,9 @@ async function loadPatients() {
 }
 
 selector.addEventListener("change", event => loadPatient(event.target.value));
+document.querySelectorAll(".signal-tab").forEach(tab => {
+    tab.addEventListener("click", () => activateSignal(tab.dataset.signal));
+});
 document.querySelectorAll(".section-link").forEach(button => {
     button.addEventListener("click", () => {
         document.querySelectorAll(".section-link").forEach(item => item.classList.remove("active"));
