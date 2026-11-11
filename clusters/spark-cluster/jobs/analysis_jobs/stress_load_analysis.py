@@ -23,7 +23,7 @@ schema = StructType([
 
 df = spark.read \
     .schema(schema) \
-    .parquet('/data/signals')
+    .parquet('/shared/processed/*.parquet')
 
 window_df = df.groupBy(
     F.col('patient_id'),
@@ -113,8 +113,8 @@ week_df = window_stat_df.groupBy(
     F.col('std_hrv'),
     F.window(
         timeColumn="window_start", 
-        windowDuration=f"7 days", 
-        slideDuration=f"7 days"
+        windowDuration=f"2 days", 
+        slideDuration=f"2 days"
     )
 ) \
 .agg(
@@ -143,22 +143,26 @@ result_df = week_df \
 .select(
     F.col('patient_id'),
     F.col('window_start'),
+    F.col('auc_eda'),
+    F.col('auc_ibi'),
+    F.col('auc_hrv'),
 
-    (F.when(F.col('prev_auc_eda').isNull(), 0)
-      .otherwise((F.col('auc_eda') - F.col('prev_auc_eda')) / (F.col('prev_auc_eda') + 1e-5))
-    ).alias('eda_improv'),
-
-    (F.when(F.col('prev_auc_ibi').isNull(), 0)
-      .otherwise((F.col('auc_ibi') - F.col('prev_auc_ibi')) / (F.col('prev_auc_ibi') + 1e-5))
-    ).alias('ibi_improv'),
-
-    (F.when(F.col('prev_auc_hrv').isNull(), 0)
-      .otherwise((F.col('auc_hrv') - F.col('prev_auc_hrv')) / (F.col('prev_auc_hrv') + 1e-5))
-    ).alias('hrv_improv'),
+    # (F.when(F.col('prev_auc_eda').isNull(), 0)
+    #   .otherwise((F.col('auc_eda') - F.col('prev_auc_eda')) / (F.col('prev_auc_eda') + 1e-5))
+    # ).alias('eda_improv'),
+    #
+    # (F.when(F.col('prev_auc_ibi').isNull(), 0)
+    #   .otherwise((F.col('auc_ibi') - F.col('prev_auc_ibi')) / (F.col('prev_auc_ibi') + 1e-5))
+    # ).alias('ibi_improv'),
+    #
+    # (F.when(F.col('prev_auc_hrv').isNull(), 0)
+    #   .otherwise((F.col('auc_hrv') - F.col('prev_auc_hrv')) / (F.col('prev_auc_hrv') + 1e-5))
+    # ).alias('hrv_improv'),
 )
 
 result_df.show()
 
 result_df.write \
     .mode('overwrite') \
+    .option('header', True) \
     .csv('/analyses/stress_load.csv')

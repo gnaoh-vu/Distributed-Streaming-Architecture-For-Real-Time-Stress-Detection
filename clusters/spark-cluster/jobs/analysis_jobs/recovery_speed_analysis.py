@@ -23,7 +23,7 @@ schema = StructType([
 
 df = spark.read \
     .schema(schema) \
-    .parquet('/data/signals')
+    .parquet('/shared/processed/*.parquet')
 
 window_df = df.groupBy(
     F.col('patient_id'),
@@ -144,4 +144,5 @@ result_df.show()
 
 result_df.write \
     .mode('overwrite') \
+    .option('header', True) \
     .csv('/analyses/recovery_speed.csv')
