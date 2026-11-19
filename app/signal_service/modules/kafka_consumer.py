@@ -1,21 +1,17 @@
 import json
 from confluent_kafka import Consumer, KafkaError, KafkaException
-from modules.db import Database
 
-running = True
+patient_to_sensors = {}
 
-def run_kafka_consumer():
-    global running
-
+def run_kafka_consumer(running: bool):
     config = {
         'bootstrap.servers': 'kafka-1:9092,kafka-2:9092',
         'auto.offset.reset': 'earliest',
-        'group.id': 'trend-consumer-7'
+        'group.id': 'consumer-12'
     }
 
-    db = Database()
     consumer = Consumer(config)
-    consumer.subscribe(['prediction'])
+    consumer.subscribe(['signal', 'prediction'])
 
     try:
         while running:
@@ -28,14 +24,44 @@ def run_kafka_consumer():
                 else: raise KafkaException(msg.error())
 
             topic = msg.topic()
-            patient_id = msg.key().decode('utf-8')
             value = json.loads(msg.value().decode('utf-8'))
+            patient_id = value.get('patient_id') if topic == 'signal' else msg.key().decode('utf-8')
 
-            print(patient_id, value['src_ts'], flush=True)
-            db.append_stress_window(patient_id, value['src_ts'])
+            if patient_id not in patient_to_sensors:
+                patient_to_sensors[patient_id] = {'sensors': [], 'predictions': []}
+
+            if topic == 'signal':
+                patient_to_sensors[patient_id]['sensors'].append(value)
+                patient_to_sensors[patient_id]['sensors'] = patient_to_sensors[patient_id]['sensors'][-1000:]
+
+            else:
+                patient_to_sensors[patient_id]['predictions'].append(value)
+                patient_to_sensors[patient_id]['predictions'] = patient_to_sensors[patient_id]['predictions'][-4:]
 
     except Exception as e:
         print(e, flush=True)
 
     finally:
         consumer.close()
+
+def get_patient_snapshot(patient_id: str):
+    return patient_to_sensors.get(patient_id, {'sensors': [], 'predictions': []})
+
+def get_patients():
+    patients = []
+
+    for patient_id, buffers in patient_to_sensors.items():
+        predictions = buffers['predictions']
+
+        latest_prediction = max(
+                predictions, 
+                key=lambda prediction: prediction.get('end', 0)
+        ) if predictions else None
+
+        patients.append({
+            'id': patient_id,
+            'name': patient_id,
+            'latest_prediction': latest_prediction,
+        })
+
+    return sorted(patients, key=lambda patient: patient['id'])
