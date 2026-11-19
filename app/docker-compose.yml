@@ -14,9 +14,18 @@ services:
     user: root
     ports:
       - 8001:8000
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+      - PYSPARK_PYTHON=./environment/bin/python
+      - PATH=/opt/spark/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
     volumes:
       - ./trend_service:/app
       - ./trend_service/db:/app/db
+      - ./trend_service/spark/jobs:/app/spark-jobs
+      - ./trend_service/spark/spark-4.3.0-bin-hadoop3:/opt/spark
+      - ./trend_service/spark/hadoop-config:/opt/hadoop/etc/hadoop
     networks:
       - project-network
 

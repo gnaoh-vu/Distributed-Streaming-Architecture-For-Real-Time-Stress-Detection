@@ -1,5 +1,9 @@
 FROM python:3.14
 
+RUN apt update
+
+RUN apt install -y openjdk-21-jdk
+
 WORKDIR /app
 
 COPY . .
