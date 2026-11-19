@@ -24,7 +24,6 @@ services:
       - ./trend_service:/app
       - ./trend_service/db:/app/db
       - ./trend_service/spark/jobs:/app/spark-jobs
-      - ./trend_service/spark/spark-4.3.0-bin-hadoop3:/opt/spark
       - ./trend_service/spark/hadoop-config:/opt/hadoop/etc/hadoop
     networks:
       - project-network
