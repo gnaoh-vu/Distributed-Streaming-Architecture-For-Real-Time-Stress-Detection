@@ -1,0 +1,39 @@
+<main class="main-panel summary hidden">
+    <div class="metric-cards">
+	<div class="metric-card">
+	    <span class="metric-label">Selected patient</span>
+	    <div class="metric-value" id="patient-value">--</div>
+	</div>
+	<div class="metric-card">
+	    <span class="metric-label">Stress events</span>
+	    <div class="metric-value" id="stress-count">0</div>
+	</div>
+	<div class="metric-card">
+	    <span class="metric-label">Peak day</span>
+	    <div class="metric-value" id="peak-day">--</div>
+	</div>
+    </div>
+
+    <section class="chart-card">
+	<div class="chart-header">
+	    <div>
+		<h3>Stress patterns</h3>
+		<p class="chart-description" id="chart-description">Frequency by day of week</p>
+	    </div>
+
+	    <div class="tabs" role="tablist" aria-label="Trend charts">
+		<button class="tab active" id="histogram-tab" role="tab" aria-selected="true">
+			Histogram
+		</button>
+
+		<button class="tab" id="heatmap-tab" role="tab" aria-selected="false">
+			Heatmap
+		</button>
+	    </div>
+	</div>
+
+	<div class="chart-container">
+	    <div id="trendChart" role="img" aria-label="Patient stress trend chart"></div>
+	</div>
+    </section>
+</main>
