@@ -1,4 +1,5 @@
-import { renderChart, renderMetricValues} from './signal-app.js'
+import { renderChart, renderMetricValues} from './monitoring.js'
+import * as constants from './constants.js'
 import { state } from './main.js'
 
 let websocket = null;
@@ -50,7 +51,7 @@ function appendSensorMessage(message) {
 	? state.dataBuffer[state.dataBuffer.length - 1].timestamp
 	: messageTimestamp;
 
-    const earliestTimestamp = latestTimestamp - state.MAX_BUFFER_SECONDS;
+    const earliestTimestamp = latestTimestamp - constants.MAX_BUFFER_SECONDS;
     state.dataBuffer = state.dataBuffer.filter(point => point.timestamp >= earliestTimestamp);
 }
 
@@ -133,13 +134,15 @@ function establishWS(patientId) {
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     websocket = new WebSocket(
-	`${protocol}//signal-service:8000/ws/patients/${encodeURIComponent(patientId)}`
+	`${protocol}//localhost:8001/ws/patients/${encodeURIComponent(patientId)}`
     );
 
-    websocket.onopen = () => {console.log('connected')}
+    websocket.onopen = () => { console.log('connected') }
     websocket.onmessage = receiveSnapshot;
     websocket.onerror = error => console.error('Patient WebSocket error:', error);
     websocket.onclose = () => {
-	if (lastPatientId === patientId) updateConnectionStatus(false);
+	if (lastPatientId === patientId) { console.log('disconnected') } 
     };
 }
+
+export { establishWS }

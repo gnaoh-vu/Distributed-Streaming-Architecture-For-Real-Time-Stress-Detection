@@ -9,16 +9,16 @@ services:
     networks:
       - project-network
 
-  # signal-service:
-  #   build: ./signal_service
-  #   user: root
-  #   ports:
-  #     - 8001:8000
-  #   volumes:
-  #     - ./signal_service:/app
-  #   networks:
-  #     - project-network
-  #
+  signal-service:
+    build: ./signal_service
+    user: root
+    ports:
+      - 8001:8000
+    volumes:
+      - ./signal_service:/app
+    networks:
+      - project-network
+
   # trend-service:
   #   build: ./trend_service
   #   user: root

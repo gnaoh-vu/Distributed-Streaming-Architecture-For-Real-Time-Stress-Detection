@@ -50,7 +50,8 @@ async def websocket_endpoint(websocket: WebSocket, patient_id: str):
 
     try:
         while True:
-            await websocket.send_json(get_patient_snapshot(patient_id))
+            snapshot = get_patient_snapshot(patient_id)
+            await websocket.send_json(snapshot)
             await asyncio.sleep(0.2)
 
     except WebSocketDisconnect:
@@ -58,7 +59,9 @@ async def websocket_endpoint(websocket: WebSocket, patient_id: str):
 
 @app.get("/patients")
 def list_patients():
-    return get_patients()
+    patients = get_patients() 
+    print(patients)
+    return patients
 
 @app.get("/", response_class=HTMLResponse)
 def dashboard(request: Request):

@@ -1,4 +1,6 @@
 import { getTimelineSeconds, formatStatus } from './utils.js'
+import * as constants from './constants.js'
+import { state } from './main.js'
 
 const signalChart = document.getElementById('signalChart')
 
@@ -17,14 +19,16 @@ function renderMetricValues(point, prediction) {
 }
 
 function renderChart(viewEndIndex) {
-    const { chart, dataBuffer } = state;
-    if (!chart || dataBuffer.length === 0) return;
+    const { dataBuffer } = state;
+    console.log(dataBuffer)
+
+    if (!signalChart || dataBuffer.length === 0) return;
 
     const endIndex = Math.max(0, Math.min(viewEndIndex, dataBuffer.length - 1));
     const endTimestamp = dataBuffer[endIndex].timestamp;
     const startTimestamp = Math.max(
 	dataBuffer[0].timestamp,
-	endTimestamp - WINDOW_SECONDS
+	endTimestamp - constants.WINDOW_SECONDS
     );
 
     const visibleData = dataBuffer.filter(point =>
@@ -60,7 +64,7 @@ function renderChart(viewEndIndex) {
 	startTimestamp + (endTimestamp - startTimestamp) * index / (tickCount - 1)
     );
 
-    Plotly.react(chart, [{
+    Plotly.react(signalChart, [{
 	x: visibleData.map(point => point.timestamp),
 	y: visibleData.map(point => point.eda),
 	type: 'scatter',
@@ -105,3 +109,5 @@ function renderChart(viewEndIndex) {
 window.addEventListener('resize', () => {
     if (signalChart && signalChart.data) Plotly.Plots.resize(signalChart);
 });
+
+export { renderChart, renderMetricValues }

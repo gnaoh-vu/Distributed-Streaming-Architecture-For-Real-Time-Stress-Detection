@@ -1,10 +1,8 @@
 import { establishWS } from './websocket.js'
-
-const WINDOW_SECONDS = 300;
-const MAX_BUFFER_SECONDS = 1000;
+import { formatStatus } from './utils.js'
+import * as constants from './constants.js'
 
 const state = {
-    MAX_BUFFER_SECONDS,
     mode: 'monitoring',
     dataBuffer: [],
     predictions: [],
@@ -13,7 +11,7 @@ const state = {
 
 async function getPatients() {
     try {
-	const response = await fetch('http://signal-service:8000/patients');
+	const response = await fetch('http://localhost:8001/patients');
 	if (!response.ok) 
 	    throw new Error(`Patient list request failed: ${response.status}`);
 	const patients = await response.json();
@@ -34,9 +32,7 @@ function connectPatient(patientId) {
     document.getElementById('time-display').innerText = 'Waiting for data';
 
     Plotly.purge(signalChart);
-    if (typeof state.onPatientChange === 'function') {
-	establishWS(patientId);
-    }
+    establishWS(patientId);
 }
 
 function renderPatientCards(patients) {
@@ -92,9 +88,9 @@ function renderPatientCards(patients) {
 
     if (!state.selectedPatientId && patients.length > 0) {
 	selector.value = String(patients[0].id);
-	resetPatient(selector.value);
+	establishWS(selector.value);
     } else if (state.selectedPatientId && !availableIds.has(state.selectedPatientId)) {
-	resetPatient(patients.length > 0 ? String(patients[0].id) : null);
+	establishWS(patients.length > 0 ? String(patients[0].id) : null);
     }
 }
 
@@ -105,4 +101,6 @@ document.getElementById('patient-selector').addEventListener('change', event => 
 });
 
 getPatients();
-window.setInterval(getPatients, 1000);
+// window.setInterval(getPatients, 1000);
+
+export { state }

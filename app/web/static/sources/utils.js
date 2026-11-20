@@ -1,5 +1,5 @@
 function getTimelineSeconds(point, origin) {
-    if (!state.dataBuffer.length || !point) return 0;
+    if (!point) return 0;
     return Math.max(0, Math.round(point.timestamp - origin));
 }
 
@@ -16,3 +16,5 @@ function formatStatus(prediction) {
 	stress
     };
 }
+
+export { getTimelineSeconds, formatStatus }

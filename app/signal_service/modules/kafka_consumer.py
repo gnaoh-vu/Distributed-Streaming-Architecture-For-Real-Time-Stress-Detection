@@ -7,7 +7,7 @@ def run_kafka_consumer(running: bool):
     config = {
         'bootstrap.servers': 'kafka-1:9092,kafka-2:9092',
         'auto.offset.reset': 'earliest',
-        'group.id': 'consumer-12'
+        'group.id': 'consumer-16'
     }
 
     consumer = Consumer(config)
