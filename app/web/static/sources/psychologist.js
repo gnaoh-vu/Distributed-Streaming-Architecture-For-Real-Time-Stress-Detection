@@ -4,9 +4,12 @@ const numeric = value => {
 };
 
 const selector = document.getElementById("patient-selector");
+const runJobsBtn = document.querySelector('.run-jobs-button')
+
 const plotConfig = { responsive: true, displaylogo: false };
 let stressLoadRows = [];
 let activeSignal = "eda";
+
 const baseLayout = {
     paper_bgcolor: "#ffffff",
     plot_bgcolor: "#ffffff",
@@ -231,9 +234,9 @@ async function loadPatient(patientId) {
 
     try {
         const [ans, load, recovery] = await Promise.all([
-            fetchJson(`/specialist-analysis/ans?patient_id=${encodeURIComponent(patientId)}`),
-            fetchJson(`/specialist-analysis/stress_load?patient_id=${encodeURIComponent(patientId)}`),
-            fetchJson(`/specialist-analysis/recovery_speed?patient_id=${encodeURIComponent(patientId)}`)
+            fetchJson(`http://localhost:8002/specialist-analysis/ans?patient_id=${encodeURIComponent(patientId)}`),
+            fetchJson(`http://localhost:8002/specialist-analysis/stress_load?patient_id=${encodeURIComponent(patientId)}`),
+            fetchJson(`http://localhost:8002/specialist-analysis/recovery_speed?patient_id=${encodeURIComponent(patientId)}`)
         ]);
         renderAns(ans);
         stressLoadRows = load;
@@ -246,7 +249,7 @@ async function loadPatient(patientId) {
 
 async function loadPatients() {
     try {
-        const patients = await fetchJson("/patients");
+        const patients = await fetchJson("http://localhost:8002/patients");
         selector.innerHTML = "";
         if (!patients.length) {
             selector.innerHTML = '<option value="">No patients found</option>';
@@ -277,7 +280,13 @@ document.querySelectorAll(".section-link").forEach(button => {
         document.getElementById(button.dataset.target).scrollIntoView({ behavior: "smooth", block: "start" });
     });
 });
+
 document.getElementById("review-date").textContent =
     new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date());
+
+runJobsBtn.onclick = async () => {
+    const successJobs = await fetchJson('http://localhost:8002/run-analyses')
+    console.log(successJobs)
+}
 
 loadPatients();

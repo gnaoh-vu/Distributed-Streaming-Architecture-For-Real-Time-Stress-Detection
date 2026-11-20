@@ -32,9 +32,6 @@ async def lifespan(app: FastAPI):
     await consumer_task
 
 app = FastAPI(lifespan=lifespan)
-templates = Jinja2Templates(directory="templates")
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -62,10 +59,3 @@ def list_patients():
     patients = get_patients() 
     print(patients)
     return patients
-
-@app.get("/", response_class=HTMLResponse)
-def dashboard(request: Request):
-    return templates.TemplateResponse(
-        request=request, name="index.html", context={"msg": 'test'}
-    )
-
