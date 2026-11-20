@@ -20,7 +20,6 @@ function renderMetricValues(point, prediction) {
 
 function renderChart(viewEndIndex) {
     const { dataBuffer } = state;
-    console.log(dataBuffer)
 
     if (!signalChart || dataBuffer.length === 0) return;
 

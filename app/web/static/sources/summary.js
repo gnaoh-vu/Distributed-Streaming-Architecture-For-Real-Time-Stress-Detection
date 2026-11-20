@@ -14,7 +14,6 @@ const patientCards = document.getElementById("patient-list-items");
 const histogramTab = document.getElementById("histogram-tab");
 const heatmapTab = document.getElementById("heatmap-tab");
 
-let activePatient = "";
 let activeChart = "histogram";
 let histogramData = [];
 let heatmapData = [];
@@ -131,10 +130,7 @@ function activateChart(chart) {
     chart === "histogram" ? renderHistogram() : renderHeatmap();
 }
 
-async function selectPatient(patientId) {
-    if (!patientId) return;
-    activePatient = patientId;
-    selector.value = patientId;
+async function getPatientSummary(patientId) {
     document.getElementById("patient-value").textContent = patientId;
 
     document.querySelectorAll(".patient-card").forEach(card => {
@@ -143,8 +139,8 @@ async function selectPatient(patientId) {
 
     try {
         [histogramData, heatmapData] = await Promise.all([
-            fetchJson(`/analysis/stress-histogram?patient_id=${encodeURIComponent(patientId)}`),
-            fetchJson(`/analysis/stress-heatmap?patient_id=${encodeURIComponent(patientId)}`)
+            fetchJson(`http://localhost:8002/analysis/stress-histogram?patient_id=${encodeURIComponent(patientId)}`),
+            fetchJson(`http://localhost:8002/analysis/stress-heatmap?patient_id=${encodeURIComponent(patientId)}`)
         ]);
         activateChart(activeChart);
     } catch (error) {
@@ -153,41 +149,7 @@ async function selectPatient(patientId) {
     }
 }
 
-async function loadPatients() {
-    try {
-        const patients = await fetchJson("http://signal-service/patients");
-        selector.innerHTML = "";
-        patientCards.innerHTML = "";
-
-        if (!patients.length) {
-            selector.innerHTML = '<option value="">No patients found</option>';
-            return;
-        }
-
-        patients.forEach(patientId => {
-            const option = document.createElement("option");
-            option.value = patientId;
-            option.textContent = `Patient ${patientId}`;
-            selector.appendChild(option);
-
-            const card = document.createElement("button");
-            card.type = "button";
-            card.className = "patient-card";
-            card.dataset.patient = patientId;
-            card.innerHTML = `<strong>Patient ${patientId}</strong><p>Select trend data</p>`;
-            card.addEventListener("click", () => selectPatient(patientId));
-            patientCards.appendChild(card);
-        });
-
-        selector.disabled = false;
-        await selectPatient(patients[0]);
-    } catch (error) {
-        selector.innerHTML = '<option value="">Unable to load patients</option>';
-        console.error("Could not load patients", error);
-    }
-}
-
-selector.addEventListener("change", event => selectPatient(event.target.value));
 histogramTab.addEventListener("click", () => activateChart("histogram"));
 heatmapTab.addEventListener("click", () => activateChart("heatmap"));
 
+export { getPatientSummary }

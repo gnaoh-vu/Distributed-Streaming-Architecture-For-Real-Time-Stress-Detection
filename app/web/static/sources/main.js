@@ -1,4 +1,7 @@
 import { establishWS } from './websocket.js'
+import { renderChart } from './monitoring.js'
+import { getPatientSummary } from './summary.js'
+
 import { formatStatus } from './utils.js'
 import * as constants from './constants.js'
 
@@ -8,6 +11,41 @@ const state = {
     predictions: [],
     selectedPatientId: null
 };
+
+const monitoringTab = document.querySelector('#monitoring-tab')
+const summaryTab = document.querySelector('#summary-tab')
+
+const monitoringDashboard = document.querySelector('.monitoring')
+const summaryDashboard = document.querySelector('.summary')
+
+function switchDashboard(tab) {
+    if (tab == 'monitoring') {
+	monitoringDashboard.classList.remove('hidden')
+	summaryDashboard.classList.add('hidden')
+	monitoringTab.classList.add('active')
+	summaryTab.classList.remove('active')
+	connectPatient(state.selectedPatientId)
+    }
+
+    else {
+	summaryDashboard.classList.remove('hidden')
+	monitoringDashboard.classList.add('hidden')
+	monitoringTab.classList.remove('active')
+	summaryTab.classList.add('active')
+	getPatientSummary(state.selectedPatientId)
+    }
+
+    state.mode = tab
+}
+
+monitoringTab.onclick = () => {
+    switchDashboard("monitoring")
+}
+
+summaryTab.onclick = () => {
+    switchDashboard("summary")
+}
+
 
 async function getPatients() {
     try {
@@ -22,7 +60,6 @@ async function getPatients() {
 }
 
 function connectPatient(patientId) {
-    state.selectedPatientId = patientId;
     state.dataBuffer = [];
     state.predictions = [];
     document.getElementById('val-eda').innerText = '--';
@@ -60,10 +97,10 @@ function renderPatientCards(patients) {
 	    card.innerHTML = '<strong></strong><p></p>';
 
 	    card.addEventListener('click', () => {
-		if (state.mode == 'monitoring') {
-		    selector.value = id;
-		    connectPatient(id);
-		}
+		selector.value = id;
+		state.selectedPatientId = id;
+		if (state.mode == 'monitoring') { connectPatient(id); } 
+		else { getPatientSummary(id) }
 	    });
 
 	    list.append(card);
@@ -87,7 +124,8 @@ function renderPatientCards(patients) {
     selector.disabled = patients.length === 0;
 
     if (!state.selectedPatientId && patients.length > 0) {
-	selector.value = String(patients[0].id);
+	selector.value = String(patients[0].id)
+	state.selectedPatientId = selector.value;
 	establishWS(selector.value);
     } else if (state.selectedPatientId && !availableIds.has(state.selectedPatientId)) {
 	establishWS(patients.length > 0 ? String(patients[0].id) : null);
@@ -95,8 +133,11 @@ function renderPatientCards(patients) {
 }
 
 document.getElementById('patient-selector').addEventListener('change', event => {
-    if (event.target.value && state.mode == 'monitoring') {
-	connectPatient(event.target.value);
+    const patientId = event.target.value
+
+    if (patientId) {
+	if (state.mode == 'monitoring') connectPatient(patientId);
+	else getPatientSummary(patientId)
     }
 });
 
