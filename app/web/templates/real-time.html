@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Stress Trend Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="/static/styles/style.css" rel="stylesheet">
+    <link href="/static/styles/workspace-nav.css" rel="stylesheet">
+    <link href="/static/styles/job-toast.css?v=20261121-1" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h2>IoT Stress Trend Analysis</h2>
+        <div class="status-badge">
+	    <button class="tab active" id="monitoring-tab" role="tab" aria-selected="true">
+		    Monitoring
+	    </button>
+
+	    <button class="tab" id="summary-tab" role="tab" aria-selected="true">
+		    Summary
+	    </button>
+        </div>
+    </header>
+
+    {% set active_page = "real-time" %}
+    {% include "components/workspace-nav.html" %}
+
+    <div class="dashboard-grid">
+        <aside class="patient-list">
+            <h3>Patients</h3>
+            <label for="patient-selector">Select patient</label>
+            <select id="patient-selector" disabled>
+                <option value="">Loading patients...</option>
+            </select>
+            <div id="patient-list-items" aria-live="polite"></div>
+        </aside>
+
+	{% include "components/monitoring-dashboard.html" %}
+	{% include "components/summary-dashboard.html" %}
+
+    </div>
+
+    {% include "components/job-toast.html" %}
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <script src="/static/sources/job-toast.js?v=20261121-2"></script>
+    <script type='module' src="/static/sources/main.js"></script>
+    <script type='module' src="/static/sources/summary.js"></script>
+</body>
+</html>

@@ -25,6 +25,14 @@ def dashboard(request: Request):
         request=request, name="index.html", context={"msg": 'test'}
     )
 
+@app.get("/real-time", response_class=HTMLResponse)
+def dashboard(request: Request):
+    return templates.TemplateResponse(
+        request=request, 
+        name="real-time.html", 
+        context={}
+    )
+
 @app.get("/psychologist", response_class=HTMLResponse)
 def psychologist_dashboard(request: Request):
     return templates.TemplateResponse(

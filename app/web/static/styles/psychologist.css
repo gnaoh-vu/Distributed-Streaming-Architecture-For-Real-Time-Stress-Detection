@@ -133,6 +133,8 @@ nav {
 
 main { padding: 26px 30px 36px; min-width: 0; }
 
+main > .workspace-nav { margin-bottom: 18px; }
+
 header {
     display: flex;
     justify-content: space-between;

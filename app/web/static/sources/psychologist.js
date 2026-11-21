@@ -4,7 +4,6 @@ const numeric = value => {
 };
 
 const selector = document.getElementById("patient-selector");
-const runJobsBtn = document.querySelector('.run-jobs-button')
 
 const plotConfig = { responsive: true, displaylogo: false };
 let stressLoadRows = [];
@@ -284,9 +283,8 @@ document.querySelectorAll(".section-link").forEach(button => {
 document.getElementById("review-date").textContent =
     new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date());
 
-runJobsBtn.onclick = async () => {
-    const successJobs = await fetchJson('http://localhost:8002/run-analyses')
-    console.log(successJobs)
-}
+window.addEventListener("analysis-jobs-completed", () => {
+    if (selector.value) loadPatient(selector.value);
+});
 
 loadPatients();

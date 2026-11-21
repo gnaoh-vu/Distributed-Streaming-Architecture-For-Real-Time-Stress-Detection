@@ -3,43 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IoT Stress Trend Analysis</title>
+    <meta name="theme-color" content="#f5f6f6">
+    <title>Stress Insight | Dashboard Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="/static/styles/style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #171a1d;
+            --muted: #81868e;
+            --line: #dde0e3;
+            --paper: #ffffff;
+            --canvas: #f5f6f6;
+            --teal: #2b6f76;
+            --rose: #a3486b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            min-width: 320px;
+            min-height: 100vh;
+            margin: 0;
+            padding: 28px clamp(18px, 5vw, 72px) 36px;
+            background: var(--canvas);
+            color: var(--ink);
+            font-family: "IBM Plex Sans", sans-serif;
+        }
+
+        .page { width: min(1120px, 100%); margin: 0 auto; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+
+        .brand-mark {
+            display: grid;
+            width: 30px;
+            height: 30px;
+            place-items: center;
+            border: 1px solid #cbdcdd;
+            background: var(--paper);
+            color: var(--teal);
+        }
+
+        .brand-mark svg { width: 17px; height: 17px; }
+
+        .header-note {
+            color: var(--muted);
+            font: 0.7rem "IBM Plex Mono", monospace;
+            letter-spacing: 0.04em;
+        }
+
+        .intro {
+            max-width: 720px;
+            padding: clamp(52px, 9vw, 100px) 0 42px;
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 0 0 16px;
+            color: var(--teal);
+            font: 500 0.72rem "IBM Plex Mono", monospace;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .eyebrow::before {
+            width: 22px;
+            height: 2px;
+            background: var(--rose);
+            content: "";
+        }
+
+        h1 {
+            max-width: 650px;
+            margin: 0;
+            font-size: clamp(2.2rem, 5vw, 3.6rem);
+            font-weight: 500;
+            letter-spacing: -0.045em;
+            line-height: 1.08;
+        }
+
+        .intro-copy {
+            max-width: 560px;
+            margin: 18px 0 0;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.65;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .dashboard-card {
+            position: relative;
+            display: flex;
+            min-height: 260px;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 25px;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            background: var(--paper);
+            color: inherit;
+            text-decoration: none;
+            transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            border-color: #b6cccd;
+            box-shadow: 0 9px 24px rgb(23 26 29 / 7%);
+        }
+
+        .dashboard-card:focus-visible {
+            outline: 2px solid var(--teal);
+            outline-offset: 3px;
+        }
+
+        .card-topline {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-number {
+            color: var(--muted);
+            font: 0.7rem "IBM Plex Mono", monospace;
+        }
+
+        .card-icon {
+            display: grid;
+            width: 38px;
+            height: 38px;
+            place-items: center;
+            border: 1px solid #dfe9e9;
+            background: #f5f9f9;
+            color: var(--teal);
+        }
+
+        .card-icon.clinical {
+            border-color: #eadde3;
+            background: #fbf7f9;
+            color: var(--rose);
+        }
+
+        .card-icon svg { width: 20px; height: 20px; }
+
+        .card-title {
+            margin: 28px 0 8px;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .card-description {
+            max-width: 410px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.86rem;
+            line-height: 1.55;
+        }
+
+        .card-action {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-top: auto;
+            padding-top: 24px;
+            color: var(--teal);
+            font: 500 0.73rem "IBM Plex Mono", monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.035em;
+        }
+
+        .clinical-card .card-action { color: var(--rose); }
+        .card-action svg { width: 15px; height: 15px; transition: transform 150ms ease; }
+        .dashboard-card:hover .card-action svg { transform: translateX(3px); }
+
+        footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 28px;
+            padding-top: 14px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font: 0.66rem "IBM Plex Mono", monospace;
+        }
+
+        @media (max-width: 680px) {
+            body { padding-inline: 18px; }
+            .header-note { display: none; }
+            .intro { padding: 56px 0 30px; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .dashboard-card { min-height: 235px; padding: 21px; }
+            footer { flex-direction: column; }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h2>IoT Stress Trend Analysis</h2>
-        <div class="status-badge">
-	    <button class="tab active" id="monitoring-tab" role="tab" aria-selected="true">
-		    Monitoring
-	    </button>
+    <div class="page">
+        <header>
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M3 12h4l2.2-6 4.1 12 2.2-6H21" stroke="currentColor" stroke-width="1.7" stroke-linecap="square" stroke-linejoin="miter"/>
+                    </svg>
+                </span>
+                Stress Insight
+            </div>
+            <span class="header-note">PATIENT MONITORING &amp; TREND REVIEW</span>
+        </header>
 
-	    <button class="tab" id="summary-tab" role="tab" aria-selected="true">
-		    Summary
-	    </button>
-        </div>
-    </header>
+        <main>
+            <section class="intro">
+                <p class="eyebrow">Dashboard portal</p>
+                <h1>Choose a workspace<br>to get started.</h1>
+                <p class="intro-copy">
+                    Explore live patient signals or review longer-term physiological trends
+                    in a focused clinical workspace.
+                </p>
+            </section>
 
-    <div class="dashboard-grid">
-        <aside class="patient-list">
-            <h3>Patients</h3>
-            <label for="patient-selector">Select patient</label>
-            <select id="patient-selector" disabled>
-                <option value="">Loading patients...</option>
-            </select>
-            <div id="patient-list-items" aria-live="polite"></div>
-        </aside>
+            <nav class="dashboard-grid" aria-label="Available dashboards">
+                <a class="dashboard-card" href="/real-time">
+                    <span class="card-topline">
+                        <span class="card-number">01 / LIVE</span>
+                        <span class="card-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M3 12h4l2-5 4 10 2-5h6M19 4v3h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/>
+                            </svg>
+                        </span>
+                    </span>
+                    <h2 class="card-title">Real-time monitoring</h2>
+                    <p class="card-description">
+                        Follow a patient’s incoming sensor signals and stress predictions as they happen.
+                    </p>
+                    <span class="card-action">
+                        Open monitoring
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M3 10h13m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"/>
+                        </svg>
+                    </span>
+                </a>
 
-	{% include "components/monitoring-dashboard.html" %}
-	{% include "components/summary-dashboard.html" %}
+                <a class="dashboard-card clinical-card" href="/psychologist">
+                    <span class="card-topline">
+                        <span class="card-number">02 / TRENDS</span>
+                        <span class="card-icon clinical" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M4 19V5m0 14h16M7 15l4-4 3 2 5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" stroke-linejoin="miter"/>
+                                <circle cx="19" cy="7" r="1.4" fill="currentColor"/>
+                            </svg>
+                        </span>
+                    </span>
+                    <h2 class="card-title">Psychologist overview</h2>
+                    <p class="card-description">
+                        Review individual ANS, stress-load, and recovery patterns across analysis periods.
+                    </p>
+                    <span class="card-action">
+                        Open clinical review
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M3 10h13m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"/>
+                        </svg>
+                    </span>
+                </a>
+            </nav>
+        </main>
 
+        <footer>
+            <span>STRESS INSIGHT · DASHBOARD PORTAL</span>
+            <span>SELECT A WORKSPACE TO CONTINUE</span>
+        </footer>
     </div>
-
-    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-    <script type='module' src="/static/sources/main.js"></script>
-    <script type='module' src="/static/sources/summary.js"></script>
 </body>
 </html>

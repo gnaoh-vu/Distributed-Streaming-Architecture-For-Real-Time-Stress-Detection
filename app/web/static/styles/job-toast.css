@@ -1,0 +1,60 @@
+.job-toast-region {
+    position: fixed;
+    z-index: 10000;
+    right: 22px;
+    bottom: 22px;
+    width: min(390px, calc(100vw - 32px));
+    pointer-events: none;
+}
+
+.job-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px 17px;
+    border: 1px solid #d9e1e2;
+    background: #ffffff;
+    color: #171a1d;
+    box-shadow: 0 10px 32px rgb(23 26 29 / 16%);
+    font: 0.84rem/1.45 "IBM Plex Sans", sans-serif;
+    pointer-events: auto;
+    animation: toast-enter 180ms ease-out;
+}
+
+.job-toast-icon {
+    display: grid;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    place-items: center;
+    color: #2b6f76;
+}
+
+.job-toast-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #dce8e8;
+    border-top-color: #2b6f76;
+    border-radius: 50%;
+    animation: toast-spin 800ms linear infinite;
+}
+
+.job-toast-success .job-toast-icon { color: #2f7d4f; }
+.job-toast-error .job-toast-icon { color: #c0392b; }
+.job-toast-message { min-width: 0; }
+.job-toast-message strong { display: block; margin-bottom: 2px; font-weight: 600; }
+.job-toast-message span { display: block; color: #737983; }
+
+@keyframes toast-spin { to { transform: rotate(360deg); } }
+@keyframes toast-enter {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 680px) {
+    .job-toast-region { right: 16px; bottom: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .job-toast, .job-toast-spinner { animation-duration: 0.01ms; }
+}

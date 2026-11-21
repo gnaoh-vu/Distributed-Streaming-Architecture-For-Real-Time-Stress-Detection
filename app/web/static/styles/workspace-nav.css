@@ -1,0 +1,47 @@
+.workspace-nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+    width: fit-content;
+    margin: 0 0 0 auto;
+    padding: 3px;
+    border: 1px solid #e3e5e8;
+    background: #ffffff;
+}
+
+.workspace-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 12px;
+    color: #737983;
+    font: 500 0.72rem "IBM Plex Mono", monospace;
+    text-decoration: none;
+    transition: background-color 140ms ease, color 140ms ease;
+}
+
+.workspace-nav a:hover {
+    background: #f5f7f7;
+    color: #2b6f76;
+}
+
+.workspace-nav a.active {
+    background: #edf4f4;
+    color: #2b6f76;
+}
+
+.workspace-nav a:focus-visible {
+    outline: 2px solid #2b6f76;
+    outline-offset: 2px;
+}
+
+@media (max-width: 680px) {
+    .workspace-nav {
+        width: 100%;
+        justify-content: center;
+        margin: 0;
+    }
+
+    .workspace-nav a { flex: 1; justify-content: center; }
+}

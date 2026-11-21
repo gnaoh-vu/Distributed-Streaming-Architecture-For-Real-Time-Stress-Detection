@@ -1,7 +1,7 @@
 import time
 import json
 import asyncio
-import subprocess
+from uuid import uuid4
 
 from fastapi import responses
 from fastapi import FastAPI, HTTPException, Request
@@ -21,6 +21,9 @@ from modules import hdfs_reader
 
 db = None
 logger = logging.getLogger(__name__)
+analysis_jobs = {}
+active_analysis_job_id = None
+analysis_job_tasks = set()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -48,18 +51,90 @@ app.add_middleware(
 async def list_patients():
     return responses.JSONResponse(content=db.get_patient_ids())
 
-@app.get('/run-analyses')
+@app.post('/run-analyses', status_code=202)
 async def run_analyses():
-    success_jobs = []
-    for analysis in hdfs_reader.Analysis:
-        success = run_job(analysis)
-        if (success): success_jobs.append(analysis.value)
+    global active_analysis_job_id
 
-    return { 'success_jobs': success_jobs }
+    if active_analysis_job_id is not None:
+        active_job = analysis_jobs.get(active_analysis_job_id)
+        if active_job and active_job["status"] in {"queued", "running"}:
+            raise HTTPException(
+                status_code=409,
+                detail="An analysis batch is already running."
+            )
 
-def run_job(analysis: hdfs_reader.Analysis):
+    job_id = uuid4().hex
+    analysis_jobs[job_id] = {
+        "job_id": job_id,
+        "status": "queued",
+        "current_analysis": None,
+        "analyses": {},
+        "started_at": None,
+        "completed_at": None,
+        "error": None,
+    }
+    active_analysis_job_id = job_id
+    task = asyncio.create_task(run_analysis_batch(job_id))
+    analysis_job_tasks.add(task)
+    task.add_done_callback(analysis_job_tasks.discard)
+    return {"job_id": job_id, "status": "queued"}
+
+@app.get("/run-analyses/active")
+async def get_active_analysis_job():
+    if active_analysis_job_id is None:
+        raise HTTPException(status_code=404, detail="No analysis batch is running.")
+    return analysis_jobs[active_analysis_job_id]
+
+@app.get("/run-analyses/{job_id}")
+async def get_analysis_job(job_id: str):
+    job = analysis_jobs.get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Analysis batch not found.")
+    return job
+
+async def run_analysis_batch(job_id: str):
+    global active_analysis_job_id
+    job = analysis_jobs[job_id]
+    job["status"] = "running"
+    job["started_at"] = time.time()
+
     try:
-        result = subprocess.run([
+        for analysis in hdfs_reader.Analysis:
+            job["current_analysis"] = analysis.value
+            job["analyses"][analysis.value] = "running"
+            try:
+                succeeded = await run_job(analysis)
+            except Exception:
+                logger.exception("Analysis job %s raised an unexpected error.", analysis.value)
+                succeeded = False
+
+            job["analyses"][analysis.value] = "completed" if succeeded else "failed"
+
+        failures = [
+            name for name, status in job["analyses"].items()
+            if status == "failed"
+        ]
+        
+        if failures:
+            job["status"] = "failed"
+            job["error"] = f"Failed analyses: {', '.join(failures)}"
+        else:
+            job["status"] = "completed"
+
+    except Exception as error:
+        logger.exception("Analysis batch %s failed unexpectedly.", job_id)
+        job["status"] = "failed"
+        job["error"] = str(error)
+
+    finally:
+        job["current_analysis"] = None
+        job["completed_at"] = time.time()
+        if active_analysis_job_id == job_id:
+            active_analysis_job_id = None
+
+async def run_job(analysis: hdfs_reader.Analysis):
+    try:
+        process = await asyncio.create_subprocess_exec(
             'spark-submit',
             '--master', 'yarn',
             '--deploy-mode', 'cluster',
@@ -69,25 +144,21 @@ def run_job(analysis: hdfs_reader.Analysis):
             '--num-executors', '2',
             '--executor-cores', '1',
             '--executor-memory', '1G',
-            f'/app/spark-jobs/{analysis.value}_analysis.py'
-        ],
-            capture_output=True,
-            text=True,
+            f'/app/spark-jobs/{analysis.value}_analysis.py',
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
         )
+        stdout, stderr = await process.communicate()
 
-        if result.returncode != 0:
-            logger.error("Spark job failed!")
-            logger.error("stdout:\n%s", result.stdout)
-            logger.error("stderr:\n%s", result.stderr)
+        if process.returncode != 0:
+            logger.error("Spark job %s failed.", analysis.value)
+            logger.error("stdout:\n%s", stdout.decode(errors="replace"))
+            logger.error("stderr:\n%s", stderr.decode(errors="replace"))
 
             return False
 
-        logger.info("Spark job completed successfully.")
+        logger.info("Spark job %s completed successfully.", analysis.value)
         return True
-
-    except subprocess.TimeoutExpired:
-        logger.exception("Spark submission timed out.")
-        return False
 
     except FileNotFoundError:
         logger.exception("spark-submit executable not found.")
